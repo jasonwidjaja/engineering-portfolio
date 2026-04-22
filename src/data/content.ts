@@ -1482,7 +1482,10 @@ export const EXPERIENCE: Job[] = [
           'Integrated rectangular vial levels to verify gyroscope orientation during assembly',
           'Reduced per-unit assembly processing time by 1 hour',
         ],
-        image: `${W}/published/screenshot-2025-03-25-145500.png`,
+        images: [
+          { src: `${W}/published/screenshot-2025-03-25-145500.png`, caption: 'Integration stand' },
+          { src: `${W}/published/screenshot-2025-03-25-145914.png`, caption: 'Translating jack screw' },
+        ],
       },
       {
         name: 'GD&T Drawing Packages',
@@ -1492,6 +1495,7 @@ export const EXPERIENCE: Job[] = [
           'Built a 25-document drawing tree for the full assembly hierarchy',
           'Managed PDM configuration control and coordinated directly with Moog for fabrication',
         ],
+        image: `${W}/published/drawing-tree-template.webp`,
       },
       {
         name: 'MATLAB-LTSpice Circuit Optimization',

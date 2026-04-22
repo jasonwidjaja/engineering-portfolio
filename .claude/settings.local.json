@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:jasonwidjaja.weebly.com)",
+      "Bash(npm install *)",
+      "Read(//usr/local/bin/**)",
+      "Read(//c/Users/jason/.nvm/versions/**)",
+      "WebFetch(domain:www.wallofportfolios.in)",
+      "Bash(cp \"C:/Users/jason/Downloads/1683581863340.jpg\" \"C:/Users/jason/Engineering Portfolio/public/headshot.jpg\")",
+      "Bash(cp \"C:/Users/jason/Downloads/Jason_Widjaja_New_Grad_ME.pdf\" \"C:/Users/jason/Engineering Portfolio/public/Jason_Widjaja_Resume.pdf\")",
+      "Bash(mkdir -p \"C:/Users/jason/Engineering Portfolio/public\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "WebFetch(domain:www.linkedin.com)",
+      "WebFetch(domain:thanhvtran.com)",
+      "Bash(curl -s https://thanhvtran.com/)",
+      "Read(//tmp/**)",
+      "Bash(grep -A 5 -B 5 \"body\\\\|container\\\\|section\\\\|color\\\\|font\\\\|rgb\\\\|#[0-9a-f]\\\\{3,6\\\\}\\\\|tailwind\\\\|class=\")",
+      "Bash(grep -oE \"color[^;]*|background[^;]*|font-family[^;]*|#[0-9a-f]{3,6}|rgb\\\\\\([^\\)]*\\\\\\)\")",
+      "Bash(grep -oE \"--ast-[^:]*:[^;]*\")",
+      "Bash(grep -E \"^three$|^@react-three\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@react-three/fiber/package.json'\\).version, require\\('./node_modules/three/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@react-three/fiber/package.json'\\).peerDependencies\\)\")",
+      "WebFetch(domain:www.juancerquera.com)",
+      "Bash(xargs wc *)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(ffmpeg -version)",
+      "Bash(where ffmpeg *)",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "Bash(where.exe ffmpeg *)",
+      "Read(//c/ProgramData/chocolatey/bin/**)",
+      "Read(//c/ffmpeg/bin/**)",
+      "Bash(python -c \"import imageio; print\\('imageio ok'\\)\")",
+      "Bash(python -m pip install imageio imageio-ffmpeg --quiet)",
+      "Bash(python *)",
+      "Bash(pip install *)",
+      "Bash(explorer C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images *)",
+      "Bash(xargs grep *)"
+    ]
+  }
+}

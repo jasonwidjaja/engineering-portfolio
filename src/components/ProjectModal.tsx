@@ -247,6 +247,11 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                   </div>
                 )}
 
+                {/* Pre-approach galleries */}
+                {project.preApproachGalleries && project.preApproachGalleries.map((g) => (
+                  <GalleryCarousel key={g.label} g={g} />
+                ))}
+
                 {/* Approach + image */}
                 {project.approach && (
                   <div>

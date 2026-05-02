@@ -539,6 +539,7 @@ export interface SkylineCard {
   headerImage?: { src: string; caption?: string }
   images?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string; containerWidth?: string }[]
   galleries?: { label: string; autoScroll?: boolean; images: { src: string; caption?: string; containerWidth?: string }[] }[]
+  preApproachGalleries?: { label: string; autoScroll?: boolean; images: { src: string; caption?: string; containerWidth?: string }[] }[]
   sideImage?: { src: string; caption?: string }
   problemExtra?: { src: string; caption?: string; pairSrc?: string; pairCaption?: string }
   problem?: string
@@ -666,7 +667,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
       { title: 'Bung Clocking', src: `${W}/clocking_orig.gif` },
       { title: 'Lifting Mechanism', src: `${W}/lifting-mechanism-front-view-online-video-cutter_orig.gif` },
       { title: 'Barrel Rolling — 4° Incline', src: `${W}/img-7658_orig.gif` },
-      { title: 'Barrel Lifting', src: `${W}/published/img-9793-online-video-cutter-com.gif` },
+      { title: 'Rolling of 550 lb barrel', src: `${W}/full-barrel-rolling_orig.gif` },
     ],
     tags: ['SolidWorks', 'FEA', 'MATLAB', 'Mechanisms'],
   },
@@ -796,9 +797,9 @@ export const SKYLINE_CARDS: SkylineCard[] = [
       { url: 'https://www.youtube.com/watch?v=2Xt8i9xkP8w', caption: 'Sounder mechanism — garage testing' },
     ],
     images: [
-      { src: `${W}/published/soundermechanism-10-1.gif`, caption: 'Blender rendering — sprocket sounder on concrete' },
       { src: `${W}/published/cstar-08.jpg`, caption: 'C-STAR robot', pairSrc: `${W}/published/screenshot-2024-12-23-203621.png`, pairCaption: '2D mapping of dense and hollow concrete from mic data' },
       { src: `${W}/published/screenshot-2024-12-23-204111.png`, caption: 'Bottom view of C-STAR', pairSrc: '/screenshot-2024-05-05-234133_orig.png', pairCaption: 'Sounder linkage body — prototype iteration' },
+      { src: `${W}/published/soundermechanism-10-1.gif`, caption: 'Blender rendering — sprocket sounder on concrete' },
       { src: `${W}/editor/screenshot-2024-12-24-010605.png`, caption: 'Sounder linkage evolution' },
       { src: `${W}/editor/screenshot-2024-01-30-005326.png`, caption: 'Sounder mechanism assembly' },
       { src: `${W}/published/screenshot-2024-12-23-200721.png`, caption: 'Sprocket detail and mic placement' },
@@ -829,7 +830,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     videos: [
       { url: 'https://www.youtube.com/watch?v=V0MTFVI5-2Y', caption: 'System overview demo' },
     ],
-    galleries: [
+    preApproachGalleries: [
       {
         label: 'Project Subsystems',
         images: [
@@ -839,6 +840,8 @@ export const SKYLINE_CARDS: SkylineCard[] = [
           { src: '/screenshot-2024-01-21-163040_orig.png', caption: '(4) Full Assembly' },
         ],
       },
+    ],
+    galleries: [
       {
         label: 'Depth Adjustment Mechanism — My Contribution',
         images: [
@@ -873,10 +876,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     category: 'Personal Project',
     cardDescription: 'Tendon-driven anthropomorphic hand prototype with independent finger actuation.',
     accent: 'green',
-    image: `${W}/thumbnail-img-3388_orig.jpg`,
-    videos: [
-      { url: 'https://www.youtube.com/watch?v=T_GyoB38Y3c', caption: 'Robotic hand demo' },
-    ],
+    image: '/robotic-hand.gif',
     imagePosition: 'top',
     imageZoom: 0.75,
     images: [
@@ -1665,7 +1665,7 @@ export const EXPERIENCE: Job[] = [
         description: 'Overhead truss-mounted fixture to ensure accurate camera placement and calibration of relative positions to global coordinates.',
         bullets: [
           'Initial sheet metal design ruled out - bends exceeded press brake limits and required excessive custom machining',
-          'Redesigned to 80/20 aluminum extrusion for easy truss interface, tool-free accessibility, and adjustable LiDar height via column slots',
+          'Redesigned to 80/20 aluminum extrusion for easy truss interface, tool-free accessibility',
           'Central LiDar enables point-cloud visualization to track moving containers across the floor',
           'Coverage area optimized based on horizontal and vertical field-of-view specifications',
         ],
@@ -1682,7 +1682,7 @@ export const EXPERIENCE: Job[] = [
             ],
           },
           3: [
-            { src: `${W}/screenshot-2023-12-25-143735_orig.png` },
+            { src: `${W}/screenshot-2023-12-25-143735_orig.png`, caption: 'Verified FOV of LiDAR to ensure it doesn\'t get blocked by structure' },
           ],
         },
       },

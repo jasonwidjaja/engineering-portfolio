@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import type { SkylineCard } from '../data/content'
@@ -11,6 +11,8 @@ interface Props {
 
 export default function ProjectModal({ project, onClose, onLightbox }: Props) {
   const { theme } = useTheme()
+  const [galleryIndices, setGalleryIndices] = useState<Record<string, number>>({})
+  useEffect(() => { setGalleryIndices({}) }, [project?.id])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -28,7 +30,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
   const gallery = (project.images ?? []).slice(0, 3)
 
   const sectionLabel: React.CSSProperties = {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'monospace',
     letterSpacing: '0.22em',
     textTransform: 'uppercase',
@@ -36,10 +38,33 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
     marginBottom: 7,
   }
 
-  function InlineImage({ img }: { img?: { src: string; caption?: string; fill?: boolean } }) {
+  function InlineImage({ img }: { img?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string } }) {
     if (!img) return null
+    if (img.pairSrc) {
+      return (
+        <div style={{ marginTop: 12, width: '75%', margin: '12px auto 0' }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[{ src: img.src, caption: img.caption }, { src: img.pairSrc, caption: img.pairCaption }].map((item, i) => (
+              <div key={i} style={{ flex: 1 }}>
+                <div
+                  style={{ borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
+                  onClick={() => onLightbox(item.src)}
+                >
+                  <img src={item.src} alt={item.caption ?? ''} style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />
+                </div>
+                {item.caption && (
+                  <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4, textAlign: 'center' }}>
+                    {item.caption}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
     return (
-      <div style={{ marginTop: 12 }}>
+      <div style={{ marginTop: 12, width: '75%', margin: '12px auto 0' }}>
         <div
           style={{ borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
           onClick={() => onLightbox(img.src)}
@@ -47,11 +72,12 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
           <img
             src={img.src}
             alt={img.caption ?? ''}
-            style={{ width: '100%', ...(img.fill ? {} : { maxHeight: 220, objectFit: 'contain' as const }), display: 'block' }}
+            style={{ width: '100%', height: 'auto', display: 'block', ...(img.filter ? { filter: img.filter } : {}), ...(img.cropBottom ? { clipPath: `inset(0 0 ${img.cropBottom}% 0)`, marginBottom: `-${img.cropBottom}%` } : {}) }}
+            loading="lazy"
           />
         </div>
         {img.caption && (
-          <p style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4, textAlign: 'center' }}>
             {img.caption}
           </p>
         )}
@@ -80,7 +106,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
             <div style={{
               pointerEvents: 'auto',
               width: '100%',
-              maxWidth: 620,
+              maxWidth: 775,
               maxHeight: '90vh',
               overflowY: 'auto',
               backgroundColor: '#0d0d18',
@@ -92,18 +118,18 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'clamp(14px, 3vw, 22px) clamp(14px, 3vw, 22px) clamp(12px, 2vw, 18px)', borderBottom: `1px solid rgba(255,255,255,0.06)` }}>
                 <div>
-                  <div style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.22em', textTransform: 'uppercase', color: theme.accent, marginBottom: 6 }}>
+                  <div style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '0.22em', textTransform: 'uppercase', color: theme.accent, marginBottom: 6 }}>
                     {project.category}
                   </div>
-                  <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', margin: '0 0 5px' }}>
+                  <h2 style={{ fontSize: 23, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', margin: '0 0 5px' }}>
                     {project.name}
                   </h2>
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5, margin: 0 }}>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5, margin: 0 }}>
                     {project.cardDescription}
                   </p>
                   {project.headerImage && (
-                    <div style={{ marginTop: 10, borderRadius: 6, overflow: 'hidden', cursor: 'zoom-in' }} onClick={() => onLightbox(project.headerImage!.src)}>
-                      <img src={project.headerImage.src} alt={project.headerImage.caption ?? ''} style={{ width: '100%', display: 'block' }} />
+                    <div style={{ marginTop: 10, borderRadius: 6, overflow: 'hidden', cursor: 'zoom-in', display: 'flex', justifyContent: 'center' }} onClick={() => onLightbox(project.headerImage!.src)}>
+                      <img src={project.headerImage.src} alt={project.headerImage.caption ?? ''} style={{ maxWidth: '100%', height: 'auto', display: 'block' }} />
                     </div>
                   )}
                 </div>
@@ -126,7 +152,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                 {project.problem && (
                   <div>
                     <div style={sectionLabel}>Problem</div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, margin: 0 }}>
+                    <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, margin: 0 }}>
                       {project.problem}
                     </p>
                     <InlineImage img={gallery[0]} />
@@ -137,18 +163,71 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                 {project.approach && (
                   <div>
                     <div style={sectionLabel}>Approach</div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, margin: 0 }}>
+                    <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, margin: 0 }}>
                       {project.approach}
                     </p>
                     <InlineImage img={gallery[1]} />
                   </div>
                 )}
 
+                {/* Galleries (carousel) */}
+                {project.galleries && project.galleries.map((gallery) => {
+                  const idx = galleryIndices[gallery.label] ?? 0
+                  const item = gallery.images[idx]
+                  const setIdx = (next: number) =>
+                    setGalleryIndices(prev => ({ ...prev, [gallery.label]: next }))
+                  const btnStyle: React.CSSProperties = {
+                    position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+                    width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.18)',
+                    background: 'rgba(0,0,0,0.55)', color: '#fff', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, lineHeight: 1, padding: 0, zIndex: 2,
+                  }
+                  return (
+                    <div key={gallery.label}>
+                      <div style={sectionLabel}>{gallery.label}</div>
+                      <div style={{ position: 'relative' }}>
+                        <div style={{ width: '75%', margin: '0 auto', borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
+                          onClick={() => onLightbox(item.src)}>
+                          <img src={item.src} alt={item.caption ?? ''} style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />
+                        </div>
+                        {gallery.images.length > 1 && (
+                          <>
+                            <button style={{ ...btnStyle, left: 0 }}
+                              onClick={() => setIdx((idx - 1 + gallery.images.length) % gallery.images.length)}>‹</button>
+                            <button style={{ ...btnStyle, right: 0 }}
+                              onClick={() => setIdx((idx + 1) % gallery.images.length)}>›</button>
+                          </>
+                        )}
+                      </div>
+                      {item.caption && (
+                        <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '6px 0 0', lineHeight: 1.4, textAlign: 'center' }}>
+                          {item.caption}
+                        </p>
+                      )}
+                      {gallery.images.length > 1 && (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 8 }}>
+                          {gallery.images.map((_, i) => (
+                            <button key={i} onClick={() => setIdx(i)} style={{
+                              width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: 'none',
+                              cursor: 'pointer', padding: 0, transition: 'all 0.2s',
+                              background: i === idx ? theme.accent : 'rgba(255,255,255,0.2)',
+                            }} />
+                          ))}
+                          <span style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)', marginLeft: 4 }}>
+                            {idx + 1} / {gallery.images.length}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+
                 {/* Result */}
                 {project.result && (
                   <div style={{ padding: '12px 14px', borderRadius: 8, background: `rgba(${theme.accentRgb},0.07)`, border: `1px solid rgba(${theme.accentRgb},0.18)` }}>
                     <div style={{ ...sectionLabel, marginBottom: 4 }}>Result</div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.7, margin: 0 }}>
+                    <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', lineHeight: 1.7, margin: 0 }}>
                       {project.result}
                     </p>
                   </div>
@@ -158,25 +237,29 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                 {project.successGrid && project.successGrid.length > 0 && (
                   <div>
                     <div style={sectionLabel}>Key Successes</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                       {project.successGrid.map(item => (
                         <div key={item.title} style={{ borderRadius: 8, overflow: 'hidden', position: 'relative', cursor: 'zoom-in' }} onClick={() => onLightbox(item.src)}>
                           <img
                             src={item.src}
                             alt={item.title}
-                            style={{ width: '100%', height: 150, objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                            style={{ width: '100%', height: 200, objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                            loading="lazy"
                           />
                           <div style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
                             padding: '18px 10px 8px',
                             background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent)',
-                            fontSize: 11, fontWeight: 600, color: '#fff',
+                            fontSize: 12, fontWeight: 600, color: '#fff',
                           }}>
                             {item.title}
                           </div>
                         </div>
                       ))}
                     </div>
+                    <p style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)', marginTop: 6, textAlign: 'center', letterSpacing: '0.05em' }}>
+                      Click on a GIF to enlarge
+                    </p>
                   </div>
                 )}
 
@@ -188,7 +271,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                       <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                         <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 7, flex: 1 }}>
                           {project.highlights.map((h, i) => (
-                            <li key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
+                            <li key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
                               <span style={{ color: theme.accent, flexShrink: 0, fontSize: 14, lineHeight: 1.2, marginTop: 1 }}>›</span>
                               {h}
                             </li>
@@ -206,7 +289,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                             />
                           </div>
                           {project.sideImage.caption && (
-                            <p style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4 }}>
+                            <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4 }}>
                               {project.sideImage.caption}
                             </p>
                           )}
@@ -216,7 +299,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                       <>
                         <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 7 }}>
                           {project.highlights.map((h, i) => (
-                            <li key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
+                            <li key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
                               <span style={{ color: theme.accent, flexShrink: 0, fontSize: 14, lineHeight: 1.2, marginTop: 1 }}>›</span>
                               {h}
                             </li>
@@ -228,21 +311,66 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                   </div>
                 )}
 
+                {/* Videos */}
+                {project.videos && project.videos.length > 0 && (
+                  <div>
+                    <div style={sectionLabel}>Videos</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {project.videos.map((vid, i) => {
+                        const videoId = vid.url.match(/[?&]v=([^&]+)/)?.[1] ?? vid.url.split('/').pop()
+                        return (
+                          <div key={i}>
+                            <div style={{ borderRadius: 8, overflow: 'hidden', position: 'relative', paddingTop: '56.25%', background: '#000' }}>
+                              <iframe
+                                src={`https://www.youtube.com/embed/${videoId}`}
+                                title={vid.caption ?? 'Video'}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                loading="lazy"
+                                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                              />
+                            </div>
+                            {vid.caption && (
+                              <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4 }}>
+                                {vid.caption}
+                              </p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Tags */}
                 {project.tags && project.tags.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 14 }}>
                     {project.tags.map(tag => (
-                      <span key={tag} style={{ padding: '3px 9px', borderRadius: 999, fontSize: 10, fontFamily: 'monospace', border: `1px solid rgba(${theme.accentRgb},0.28)`, color: theme.accent, background: `rgba(${theme.accentRgb},0.06)` }}>
+                      <span key={tag} style={{ padding: '3px 9px', borderRadius: 999, fontSize: 11, fontFamily: 'monospace', border: `1px solid rgba(${theme.accentRgb},0.28)`, color: theme.accent, background: `rgba(${theme.accentRgb},0.06)` }}>
                         {tag}
                       </span>
                     ))}
                   </div>
                 )}
 
+                {/* PDF preview */}
+                {project.posterPdf && (
+                  <div>
+                    <div style={{ ...sectionLabel, marginBottom: 8 }}>{project.pdfLabel ?? 'Final Poster'}</div>
+                    <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <iframe
+                        src={project.posterPdf}
+                        title={project.pdfLabel ?? 'PDF'}
+                        style={{ width: '100%', height: 520, border: 'none', display: 'block', background: '#fff' }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Press / article links */}
                 {project.articles && project.articles.length > 0 && (
                   <div>
-                    <div style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.22em', textTransform: 'uppercase', color: theme.accent, marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '0.22em', textTransform: 'uppercase', color: theme.accent, marginBottom: 8 }}>
                       As Featured In
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -254,7 +382,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                           rel="noopener noreferrer"
                           style={{
                             display: 'inline-flex', alignItems: 'center', gap: 5,
-                            padding: '5px 12px', borderRadius: 999, fontSize: 12,
+                            padding: '5px 12px', borderRadius: 999, fontSize: 13,
                             border: '1px solid rgba(255,255,255,0.12)',
                             color: 'rgba(255,255,255,0.7)',
                             background: 'rgba(255,255,255,0.04)',

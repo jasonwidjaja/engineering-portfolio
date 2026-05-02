@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useTheme } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import About from './components/About'
 import ProjectsGrid from './components/ProjectsGrid'
 import Experience from './components/Experience'
 import OffDutyAdventures from './components/OffDutyAdventures'
@@ -32,6 +33,7 @@ export default function App() {
     <div style={{ backgroundColor: theme.background, color: '#ffffff', minHeight: '100vh' }}>
       <Navbar />
       <Hero />
+      <About />
       <ProjectsGrid onCardClick={handleCardClick} />
       <Experience />
       <OffDutyAdventures />

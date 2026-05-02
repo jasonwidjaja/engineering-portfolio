@@ -37,8 +37,10 @@ export interface SubProject {
   name: string
   description: string
   bullets: string[]
+  subBullets?: number[]
+  bulletImages?: Record<number, { layout?: 'split-stack'; items: { src: string; caption?: string; fit?: 'contain' | 'cover'; wide?: boolean; cropBottom?: number; cropTop?: number; halfWidth?: boolean; widthClass?: string }[] } | { src: string; caption?: string; fit?: 'contain' | 'cover'; wide?: boolean; cropBottom?: number; cropTop?: number; halfWidth?: boolean; widthClass?: string }[]>
   image?: string
-  images?: { src: string; caption?: string; fit?: 'contain' | 'cover'; wide?: boolean; hero?: boolean }[]
+  images?: { src: string; caption?: string; fit?: 'contain' | 'cover'; wide?: boolean; hero?: boolean; height?: string }[]
   pairItems?: PairItem[]
   note?: string
 }
@@ -50,9 +52,11 @@ export interface Job {
   location: string
   accent: string
   image: string
+  logo?: string
   featured?: boolean
   overview: string
   overviewImage?: string
+  overviewCaption?: string
   highlights: string[]
   projects: SubProject[]
 }
@@ -82,7 +86,7 @@ export interface OffDutyHighlight {
 export const PERSONAL = {
   name: 'Jason Matthew Widjaja',
   title: 'Mechanical Engineer',
-  tagline: 'Mechanical systems, robotics, and the gap between a sketch and something that actually works.',
+  tagline: 'Open to full-time roles in mechanical engineering, robotics, and hardware development in Summer 2026.',
   location: 'Boston, MA',
   email: 'widjaja.ja@northeastern.edu',
   linkedin: 'https://www.linkedin.com/in/jason-matthew-widjaja/',
@@ -100,6 +104,12 @@ export const CREDENTIALS = [
 ]
 
 export const PREVIOUS_COMPANIES = ['Amazon Robotics', 'Draper Laboratory', 'Berkshire Grey']
+
+export const COMPANY_LOGOS = [
+  { name: 'Amazon Robotics', src: `${W}/editor/images.png`, imgClass: 'h-7 w-36 object-contain' },
+  { name: 'Draper Laboratory', src: `${W}/published/download.png`, imgClass: 'h-7 w-auto object-contain' },
+  { name: 'Berkshire Grey',   src: `${W}/published/ot-logo-bg.png`, imgClass: 'h-7 w-36 object-contain' },
+]
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 
@@ -129,7 +139,7 @@ export const SKILLS: string[] = [
 export const OFF_DUTY_PHOTOS: OffDutyPhoto[] = [
   { src: `${W}/editor/img-5365.gif`, caption: 'Dragon Boat Racing' },
   { src: '/singapore.jpg', caption: 'NTU Singapore' },
-  { src: `${W}/editor/436514984-1505891307020408-8002921743487547005-n.png`, caption: 'Exploring the World' },
+  { src: '/IMG_2364.jpg', caption: 'Exploring the World' },
 ]
 
 export const OFF_DUTY_HIGHLIGHTS: OffDutyHighlight[] = [
@@ -526,7 +536,8 @@ export interface SkylineCard {
   imagePosition?: string                           // CSS objectPosition for the card image
   imageZoom?: number                               // scale factor for the card image (e.g. 0.75 = zoom out 25%)
   headerImage?: { src: string; caption?: string }
-  images?: { src: string; caption?: string; fill?: boolean }[]
+  images?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string }[]
+  galleries?: { label: string; images: { src: string; caption?: string }[] }[]
   sideImage?: { src: string; caption?: string }
   problem?: string
   approach?: string
@@ -534,6 +545,9 @@ export interface SkylineCard {
   highlights?: string[]
   successGrid?: { title: string; src: string }[]
   articles?: { label: string; url: string }[]
+  videos?: { url: string; caption?: string }[]
+  posterPdf?: string
+  pdfLabel?: string
   tags: string[]
 }
 
@@ -569,20 +583,51 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     tags: ['Reinforcement Learning', 'MuJoCo', 'Python', 'YOLO', 'SAC', 'PPO', 'Robotics'],
   },
   {
+    id: 'ankle-exo',
+    name: 'Ankle Exoskeleton',
+    category: 'Course Project · ME 6250',
+    cardDescription: 'Low-cost 3D-printed ankle exoskeleton with cable-driven plantarflexion assist and IMU-based gait detection.',
+    accent: 'green',
+    image: '/exo/p3_img0.png',
+    imageZoom: 0.9,
+    images: [
+      { src: '/exo/p3_img0.png', caption: 'Final assembled prototype — CAD render and physical build' },
+      { src: '/exo-demo.gif', caption: 'Prototype demonstrating cable-driven plantarflexion assist at toe-off', fill: true, filter: 'saturate(0.6) contrast(0.9)', cropBottom: 20 },
+      { src: '/exo/p2_img2.png', caption: 'Exploded view: Moteus C1 motor, 5:1 planetary gearbox, ring carrier, and pulley' },
+      { src: '/exo/p2_img1.png', caption: 'Final power transmission — isometric and exploded CAD views (120 mm diameter)' },
+      { src: '/exo/p2_img3.png', caption: 'First iteration prototype (200 mm diameter) — oversized SOLIDWORKS gears' },
+    ],
+    problem: 'Ankle exoskeletons range from $300 for passive braces to over $90,000 for FDA-approved robotic systems, making them inaccessible for most research and clinical use. Existing designs rely on expensive custom actuators and precision-machined components. The goal was to build a functional cable-driven exoskeleton using additive manufacturing that could augment Achilles tendon force during gait — proving out the mechanical and control architecture at a fraction of the cost.',
+    approach: 'Designed a three-subsystem prototype: a PLA calf brace (3 iterations) housing a moteus-C1 BLDC motor and custom SLA-printed 5:1 planetary gearbox (downsized from 200 mm to 120 mm diameter using COTS McMaster gears), a foot brace acting as the shoe sole with a rear cable hook and IMU cavity, and rails connecting both along the shank. A Raspberry Pi 4 reads an MPU6050 IMU at 100 Hz over I2C, fuses accelerometer and gyroscope via a complementary filter (98%/2%), and commands the motor over CAN-FD at 5 Mbps. Threshold-based logic detects toe-off (pitch < −16°) and triggers plantarflexion, returning home when pitch > −8°.',
+    result: 'Functional prototype delivering plantarflexion assistance at toe-off during gait. Demonstrated feasibility of a low-cost, additively manufactured exoskeleton — achieving >10 N·m peak torque — as a viable alternative to precision-machined systems.',
+    highlights: [
+      'Led power transmission design: specified 5:1 planetary gear ratio and increased output pulley diameter by 25% to meet torque spec — validated against prior 6:1 iteration that was mechanically sound but too large to package',
+      'Downsized gearbox from 200 mm to 120 mm diameter by switching to COTS McMaster gears modified to accept press-fit bearings',
+      'Ideated nut-and-bolt fastener slot geometry in the calf brace for secure, rework-accessible component attachment without adhesives',
+      'Led system integration: coordinated wiring routing, fastener interfaces, and CAN-FD bus layout across calf brace, foot plate, and rail assembly',
+      'Complementary filter (98% gyro / 2% accel) produces stable ankle pitch estimate; 3-second startup calibration sets zero reference',
+      'Threshold gait logic: pitch < −16° triggers active plantarflexion, pitch > −8° returns motor home passively',
+      'Motor control: moteus-C1 FOC at 15–30 kHz, 10 ms position commands over CAN-FD with hardware watchdog safeguard',
+      'Power: 4S1P LiPo (14.8 V, 5000 mAh, 74 Wh) with buck converter to 5 V for Raspberry Pi',
+    ],
+    tags: ['SolidWorks', 'Python', 'Raspberry Pi', 'BLDC', 'Gait Detection', 'IMU', '3D Printing', 'Mechatronics', 'CAN-FD'],
+  },
+  {
     id: 'bourbot',
     name: 'Bourbot',
     category: 'Senior Capstone',
     cardDescription: '550-lb whiskey barrel handling robot. Designed the actuated ball-screw lifting mechanism.',
     accent: 'amber',
     image: `${W}/full-barrel-rolling_orig.gif`,
+    posterPdf: '/bourbot_final_poster.pdf',
     images: [
+      { src: `${W}/published/screenshot-2025-07-03-004616.png`, caption: 'Preliminary Design Sketch of Bourbot' },
+      { src: `${W}/published/screenshot-2025-07-03-004803.png`, caption: 'Ball Screw Calculations', pairSrc: `${W}/published/screenshot-2025-07-03-004839.png`, pairCaption: 'Structural Calculations' },
+      { src: `${W}/lifting-mechanism-front-view-online-video-cutter_orig.gif`, caption: 'Lifting mechanism' },
       { src: `${W}/published/bourbot.png`, caption: 'Bourbot robot' },
       { src: `${W}/published/screenshot-2025-05-19-004650.png`, caption: 'Preliminary design sketch' },
-      { src: `${W}/lifting-mechanism-front-view-online-video-cutter_orig.gif`, caption: 'Lifting mechanism' },
       { src: `${W}/img-7658_orig.gif`, caption: 'Barrel rolling on 4° incline' },
       { src: `${W}/published/img-9793-online-video-cutter-com.gif`, caption: 'Barrel lifting demo' },
-      { src: `${W}/published/screenshot-2025-07-03-004803.png`, caption: 'Ball-screw calculations' },
-      { src: `${W}/published/screenshot-2025-07-03-004839.png`, caption: 'Shaft reaction load calculations' },
       { src: `${W}/editor/img-8672-720.jpg`, caption: 'Team photo – Capstone day' },
     ],
     problem: "Rickhouses weren't built for machines — narrow aisles, sloped floors, and 550-lb barrels that want to roll wherever they feel like. I had to design a lifting mechanism that could clock a barrel's bung plug to within a few degrees and lift it cleanly, all in a space barely wider than the robot itself.",
@@ -612,6 +657,9 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     cardDescription: '1st place lunar snake robot. Artemis Award, $170K+ funding.',
     accent: 'amber',
     image: `${W}/published/screenshot-2024-01-21-172643.png`,
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=Zv2XgsOK-Tg', caption: 'Field testing at the NASA Big Idea Forum 2022' },
+    ],
     images: [
       { src: `${W}/northeastern-cobra-highlights_orig.gif`, caption: 'COBRA locomotion highlights' },
       { src: `${W}/published/screenshot-2024-01-21-172942.png`, caption: 'Voltage regulator enclosure CAD' },
@@ -672,9 +720,15 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     cardDescription: 'Dual-system supplement dispenser. Hardware lead, team of 5 MEs.',
     accent: 'purple',
     image: `${W}/published/fitolux-countertop-ezgif-com-crop-1.gif`,
+    posterPdf: '/auger_screw_motor_calculation_slides.pdf',
+    pdfLabel: 'View Motor Calculations',
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=cfATa8s__wA', caption: 'Countertop powder dispensing demo' },
+    ],
     images: [
-      { src: `${W}/screenshot-2025-02-01-182356_orig.png`, caption: 'Fitolux system overview' },
+      { src: `${W}/screenshot-2025-02-01-182356_orig.png`, caption: 'Countertop Dispenser', pairSrc: '/thumbnail-image8_orig.jpg', pairCaption: 'Portable Dispenser' },
       { src: `${W}/published/fitlolux-portable-clip.gif`, caption: 'Portable unit demo' },
+      { src: '/thumbnail-image4_orig.jpg', caption: 'Silicone mold — before', pairSrc: '/thumbnail-image6_orig.jpg', pairCaption: 'Silicone mold — after improvements' },
       { src: `${W}/editor/sweeper-mechanism.gif`, caption: 'Sweeper mechanism' },
       { src: `${W}/published/screenshot-2024-12-23-234103.png`, caption: 'Silicone mold – gripper handle v3' },
       { src: `${W}/published/screenshot-2024-12-23-234817.png`, caption: 'Silicone mold iterations' },
@@ -703,13 +757,18 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     category: 'Generate Product Development · Spring 2024',
     cardDescription: 'Acoustic concrete delamination detection robot. Led sounder mechanism.',
     accent: 'purple',
-    image: `${W}/published/cstar-08.jpg`,
+    image: `${W}/published/soundermechanism-10-1.gif`,
+    posterPdf: '/c-star_hw_final_report.pdf',
+    pdfLabel: 'View Final Report',
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=cR8J74fFZMI', caption: 'C-STAR in action' },
+      { url: 'https://www.youtube.com/watch?v=2Xt8i9xkP8w', caption: 'Sounder mechanism — garage testing' },
+    ],
     images: [
-      { src: `${W}/published/soundermechanism-10-1.gif`, caption: 'Sprocket sounder striking concrete' },
-      { src: `${W}/published/cstar-08.jpg`, caption: 'C-STAR robot at parking garage' },
+      { src: `${W}/published/soundermechanism-10-1.gif`, caption: 'Blender rendering — sprocket sounder on concrete' },
+      { src: `${W}/published/cstar-08.jpg`, caption: 'C-STAR robot', pairSrc: `${W}/published/screenshot-2024-12-23-203621.png`, pairCaption: '2D mapping of dense and hollow concrete from mic data' },
+      { src: `${W}/published/screenshot-2024-12-23-204111.png`, caption: 'Bottom view of C-STAR', pairSrc: '/screenshot-2024-05-05-234133_orig.png', pairCaption: 'Sounder linkage body — prototype iteration' },
       { src: `${W}/editor/screenshot-2024-12-24-010605.png`, caption: 'Sounder linkage evolution' },
-      { src: `${W}/published/screenshot-2024-12-23-203621.png`, caption: 'Spring constant analysis' },
-      { src: `${W}/published/screenshot-2024-12-23-204111.png`, caption: 'Mechanism integration into chassis' },
       { src: `${W}/editor/screenshot-2024-01-30-005326.png`, caption: 'Sounder mechanism assembly' },
       { src: `${W}/published/screenshot-2024-12-23-200721.png`, caption: 'Sprocket detail and mic placement' },
     ],
@@ -734,23 +793,48 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     cardDescription: 'Dynamic vertical kelp farm system with autonomous depth adjustment.',
     accent: 'purple',
     image: `${W}/editor/screenshot-2024-01-21-163135.png`,
+    posterPdf: '/wavewise_final_report.pdf',
+    pdfLabel: 'View Final Report',
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=V0MTFVI5-2Y', caption: 'System overview demo' },
+    ],
+    galleries: [
+      {
+        label: 'Project Subsystems',
+        images: [
+          { src: '/screenshot-2024-01-21-162942_orig.png', caption: '(1) Buoy' },
+          { src: '/screenshot-2024-01-21-162959_orig.png', caption: '(2) Depth Adjustment System' },
+          { src: '/screenshot-2024-01-21-163020_orig.png', caption: '(3) Submersible Module' },
+          { src: '/screenshot-2024-01-21-163040_orig.png', caption: '(4) Full Assembly' },
+        ],
+      },
+      {
+        label: 'Depth Adjustment Mechanism — My Contribution',
+        images: [
+          { src: '/screenshot-2024-01-21-163742_orig.png', caption: 'Top-level assembly' },
+          { src: '/screenshot-2024-01-21-163759_orig.png', caption: 'Drivetrain detail' },
+          { src: '/screenshot-2024-01-21-163819_orig.png', caption: 'Gear reduction assembly' },
+          { src: '/screenshot-2024-01-21-163836_orig.png', caption: 'Component breakdown' },
+        ],
+      },
+    ],
     images: [
-      { src: `${W}/screenshot-2024-01-21-162635_orig.png`, caption: 'Depth adjustment system overview' },
-      { src: `${W}/published/screenshot-2024-01-21-164135.png`, caption: 'Buoy system full assembly' },
+      { src: `${W}/screenshot-2024-01-21-162635_orig.png`, caption: 'Depth adjustment system' },
+      { src: '/screenshot-2024-01-21-164647_orig.png', caption: 'Neutral buoyancy, lift force & drum geometry calculations', pairSrc: '/screenshot-2024-01-21-164708_orig.png', pairCaption: 'Motor torque spec at FOS 3' },
+      { src: '/screenshot-2024-01-21-165110_orig.png', caption: 'Underwater test', pairSrc: '/img-1325_orig.gif', pairCaption: 'Depth adjustment in action' },
     ],
-    problem: 'Maine aquatic farmers needed a kelp farm that could expand to new locations where fixed-depth systems fail — sunlight, temperature, and nutrients all vary significantly with depth. The depth adjustment system had to function reliably in harsh, low-temperature marine environments with IP-68 protection.',
-    approach: 'Designed a winch-based depth adjustment system with a differential gear drive train. Three drums handle: kelp line release, kelp line retrieval, and electrical cable to the submersible sensors. A 2:1 gear reduction provides higher torque at lower speeds. Sized for motor torque via hand calculations with an FOS of 3. Packaged electronics in a COTS IP-68 enclosure. Initial ballast tank concept (3–5 cubic feet required) was abandoned as unfeasible within budget.',
-    result: 'Functional first prototype of depth adjustment for submersible demonstrated in an aquatic environment.',
+    problem: 'Maine aquatic farmers needed a kelp farm that could reach locations where fixed-depth systems fail — sunlight, temperature, and nutrients all vary with depth. The challenge: design a reliable depth adjustment mechanism that survives harsh marine environments with IP-68 protection.',
+    approach: 'Designed the depth adjustment mechanism — a winch system with a differential gear drivetrain driving three drum lines (kelp release, kelp retrieval, and submersible electrical cable) from a single motor. The differential enables opposite-direction drum rotation as needed. A 2:1 gear reduction delivers higher torque at lower speeds. Hand-calculated submersible mass for neutral buoyancy, required lift force, minimum drum radius for 75 ft of rope, and motor torque at FOS 3. Full drivetrain and electronics packaged inside a COTS IP-68 enclosure.',
+    result: 'Functional depth adjustment prototype demonstrated in an aquatic environment — submersible successfully adjusted depth on command.',
     highlights: [
-      'Designed a differential-gear winch system with three drum lines — kelp line release, retrieval, and submersible electrical cable',
-      '2:1 gear reduction provides higher torque at lower motor speeds for reliable depth adjustment',
-      'Sized for motor torque through hand calculations at FOS 3, accounting for kelp line and submersible loads',
-      'Packaged electronics in a COTS IP-68 rated enclosure for full submersion in marine environments',
-      'Submersible module hosts salinity, pH, temperature, UV light, and pressure sensors for autonomous depth control',
-      'Ruled out initial ballast tank approach (required 20–33 gallon capacity — unfeasible on budget/timeline)',
-      'Achieved functional first prototype demonstrating depth adjustment in an aquatic environment',
+      'Designed differential-gear winch system driving three drum lines (kelp release, retrieval, electrical cable) from a single motor',
+      'Differential gear drivetrain enables opposite-direction drum rotation simultaneously from one motor input',
+      '2:1 gear reduction delivers higher torque at lower drum speeds for reliable load handling',
+      'Hand-calculated: submersible mass for neutral buoyancy, lift force, minimum drum radius for 75 ft of rope, and motor torque at FOS 3',
+      'Full drivetrain and electronics packaged in a COTS IP-68 enclosure rated for full marine submersion',
+      'Submersible module integrates salinity, pH, temperature, UV, and pressure sensors for autonomous depth control',
     ],
-    tags: ['SolidWorks', 'IP68', 'Marine', 'Sensors'],
+    tags: ['SolidWorks', 'IP68', 'Marine', 'Mechanisms', 'Sensors'],
   },
   {
     id: 'robotic-hand',
@@ -759,6 +843,9 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     cardDescription: 'Tendon-driven anthropomorphic hand prototype with independent finger actuation.',
     accent: 'green',
     image: `${W}/thumbnail-img-3388_orig.jpg`,
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=T_GyoB38Y3c', caption: 'Robotic hand demo' },
+    ],
     imagePosition: 'top',
     imageZoom: 0.75,
     images: [
@@ -877,6 +964,9 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     id: 'motor-control',
     name: 'DC Motor Control',
     category: 'Course Project · Mechatronics',
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=eg0QcOfAqgM', caption: 'DC motor control demo' },
+    ],
     cardDescription: 'Simscape closed-loop motor control with hardware verification. Position + speed.',
     accent: 'green',
     image: `${W}/published/simulation-motor.png`,
@@ -925,7 +1015,8 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     accent: 'green',
     image: `${W}/editor/front-view-joradn-access-cad.png`,
     images: [
-      { src: `${W}/editor/jordan-access-1-right-view-cad.png`, caption: 'Right view' },
+      { src: '/screenshot-2023-11-05-010357-orig_orig.png', caption: 'Jordan Access 1 CAD' },
+      { src: `${W}/editor/jordan-access-1-right-view-cad.png`, caption: 'Right view', pairSrc: `${W}/editor/front-view-joradn-access-cad.png`, pairCaption: 'Front view' },
     ],
     problem: 'Develop advanced SolidWorks surfacing and spline techniques through a complex organic geometry challenge as part of CSWA certification coursework.',
     approach: 'Modeled complex shoe geometry using advanced splines for realistic surface curvature. Rendered the Jordan logo and Jumpman signature as integrated 3D surface features.',
@@ -955,34 +1046,6 @@ export const SKYLINE_CARDS: SkylineCard[] = [
       'Motion Study animating rotating turbine and fan blade kinematics',
     ],
     tags: ['SolidWorks', 'Motion Study', 'CAD'],
-  },
-  {
-    id: 'ankle-exo',
-    name: 'Ankle Exoskeleton',
-    category: 'Course Project · ME 6250',
-    cardDescription: 'Low-cost 3D-printed ankle exoskeleton with cable-driven plantarflexion assist and IMU-based gait detection.',
-    accent: 'green',
-    image: '/exo/p3_img0.png',
-    imageZoom: 0.9,
-    images: [
-      { src: '/exo-demo.gif', caption: 'Prototype demonstrating cable-driven plantarflexion assist at toe-off', fill: true },
-      { src: '/exo/p2_img2.png', caption: 'Exploded view: Moteus C1 motor, 5:1 planetary gearbox, ring carrier, and pulley' },
-      { src: '/exo/p2_img1.png', caption: 'Final power transmission — isometric and exploded CAD views (120 mm diameter)' },
-      { src: '/exo/p2_img3.png', caption: 'First iteration prototype (200 mm diameter) — oversized SOLIDWORKS gears' },
-    ],
-    problem: 'Ankle exoskeletons range from $300 for passive braces to over $90,000 for FDA-approved robotic systems, making them inaccessible for most research and clinical use. Existing designs rely on expensive custom actuators and precision-machined components. The goal was to build a functional cable-driven exoskeleton using additive manufacturing that could augment Achilles tendon force during gait — proving out the mechanical and control architecture at a fraction of the cost.',
-    approach: 'Designed a three-subsystem prototype: a PLA calf brace (3 iterations) housing a moteus-C1 BLDC motor and custom SLA-printed 5:1 planetary gearbox (downsized from 200 mm to 120 mm diameter using COTS McMaster gears), a foot brace acting as the shoe sole with a rear cable hook and IMU cavity, and rails connecting both along the shank. A Raspberry Pi 4 reads an MPU6050 IMU at 100 Hz over I2C, fuses accelerometer and gyroscope via a complementary filter (98%/2%), and commands the motor over CAN-FD at 5 Mbps. Threshold-based logic detects toe-off (pitch < −16°) and triggers plantarflexion, returning home when pitch > −8°.',
-    result: 'Functional prototype delivering plantarflexion assistance at toe-off during gait. Demonstrated feasibility of a low-cost, additively manufactured exoskeleton — achieving >10 N·m peak torque — as a viable alternative to precision-machined systems.',
-    highlights: [
-      'Designed calf brace through 3 iterations: SLA (too flexible) → PLA undersized → final PLA with widened diameter and shortened profile for comfort',
-      'Power transmission downsized from 200 mm to 120 mm diameter by switching to COTS McMaster gears modified to fit bearings on hand',
-      'Complementary filter (98% gyro / 2% accel) produces stable ankle pitch estimate; 3-second startup calibration sets zero reference',
-      'Threshold gait logic: pitch < −16° triggers active plantarflexion, pitch > −8° returns motor home passively',
-      'Motor control: moteus-C1 FOC at 15–30 kHz, 10 ms position commands over CAN-FD with hardware watchdog safeguard',
-      'Power: 4S1P LiPo (14.8 V, 5000 mAh, 74 Wh) with buck converter to 5 V for Raspberry Pi',
-      'Automated calibration routine measures winding resistance (0.063 Ω), phase inductance (28 µH), and motor Kv (310.8 RPM/V)',
-    ],
-    tags: ['SolidWorks', 'Python', 'Raspberry Pi', 'BLDC', 'Gait Detection', 'IMU', '3D Printing', 'Mechatronics', 'CAN-FD'],
   },
   // ── Work Experience (blue) ─────────────────────────────────────────────────
   {
@@ -1326,7 +1389,7 @@ export const EXPERIENCE: Job[] = [
     period: 'Jul - Dec 2025',
     location: 'Bedford, MA',
     accent: '#3b82f6',
-    featured: true,
+    logo: `${W}/published/ot-logo-bg.png`,
     image: `${W}/bgsquad_orig.jpg`,
     overview:
       'Joined during pilot production of Scoop — a fully autonomous robotic trailer unloader — and drove mechanical work across multiple systems toward full-scale deployment. Designed test rigs for conveyor and kinematic validation, implemented drivetrain improvements, converted a machined component into a cost-down sheet metal design, and released fixture assemblies for customer sites.',
@@ -1405,11 +1468,17 @@ export const EXPERIENCE: Job[] = [
           'Second iteration: fully bolted sheet-metal assembly with M4 countersunk screws - eliminated welding, simplified fabrication',
           '62.55% cost reduction - $280.89 vs. $750 per unit at quantity 8',
         ],
-        images: [
-          { src: `${W}/pli-loading-interface_orig.png`, caption: 'Original CNC machined PLI body', hero: true, fit: 'contain' },
-          { src: `${W}/first-iteration-pli_orig.png`, caption: 'First iteration - tab-and-slot sheet metal with welding', fit: 'contain' },
-          { src: `${W}/v2-pli_orig.png`, caption: 'Second iteration - fully bolted sheet-metal assembly', fit: 'contain' },
-        ],
+        bulletImages: {
+          0: [
+            { src: `${W}/pli-loading-interface_orig.png`, caption: 'Original CNC machined PLI body', fit: 'contain', widthClass: 'w-3/4' },
+          ],
+          1: [
+            { src: `${W}/first-iteration-pli_orig.png`, caption: 'First iteration - tab-and-slot sheet metal with welding', fit: 'contain', widthClass: 'w-3/4' },
+          ],
+          2: [
+            { src: `${W}/v2-pli_orig.png`, caption: 'Second iteration - fully bolted sheet-metal assembly', fit: 'contain' },
+          ],
+        },
         note: 'Project handed off to senior ME to continue PLI bridge body redesign.',
       },
       {
@@ -1464,6 +1533,7 @@ export const EXPERIENCE: Job[] = [
     period: 'Jul - Dec 2024',
     location: 'Cambridge, MA',
     accent: '#a855f7',
+    logo: `${W}/published/download.png`,
     image: `${W}/published/screenshot-2025-03-25-143254.png`,
     overview:
       'Supported the Next Generation Interferometric Fiber Optic Gyroscope (IFOG) program - improving integration hardware, releasing GD&T drawing packages, and building a MATLAB-LTSpice circuit optimization workflow.',
@@ -1481,21 +1551,21 @@ export const EXPERIENCE: Job[] = [
           'Third POC iteration used a differential worm gear for motorized vertical actuation',
           'Integrated rectangular vial levels to verify gyroscope orientation during assembly',
           'Reduced per-unit assembly processing time by 1 hour',
+          'Due to scope of co-op timeline, further refinements and prototyping could not be pursued.',
         ],
         images: [
-          { src: `${W}/published/screenshot-2025-03-25-145500.png`, caption: 'Integration stand' },
-          { src: `${W}/published/screenshot-2025-03-25-145914.png`, caption: 'Translating jack screw' },
+          { src: `${W}/published/screenshot-2025-03-25-145500.png`, hero: true, fit: 'contain' },
+          { src: `${W}/published/screenshot-2025-03-25-145914.png`, caption: 'Translating Jack Screw Mechanism used for third iteration concept', fit: 'contain' },
         ],
       },
       {
         name: 'GD&T Drawing Packages',
-        description: 'Released 30+ precision drawing packages for an undisclosed program to support external contractor fabrication.',
+        description: 'Released 30+ precision drawing packages to support external contractor fabrication of a precise fluid dispensing assembly for coil hubs during the IFOG assembly process.',
         bullets: [
           'ASME Y14.5 compliant part and assembly drawings covering sub-assemblies, COTS, machined, and 3D-printed parts',
           'Built a 25-document drawing tree for the full assembly hierarchy',
           'Managed PDM configuration control and coordinated directly with Moog for fabrication',
         ],
-        image: `${W}/published/drawing-tree-template.webp`,
       },
       {
         name: 'MATLAB-LTSpice Circuit Optimization',
@@ -1523,9 +1593,12 @@ export const EXPERIENCE: Job[] = [
     period: 'Jul - Dec 2023',
     location: 'Westborough, MA',
     accent: '#f59e0b',
+    logo: `${W}/editor/images.png`,
     image: `${W}/editor/20231109-135637-1.gif`,
     overview:
-      "Worked in the Innovation Lab focused on novel identification technologies to improve pallet and barcode recognition - designing, building, and iterating on camera systems, calibration fixtures, and computer vision hardware.",
+      "Worked in the Innovation Lab - Amazon Robotics' skunkworks-style R&D group - focused on novel identification technologies to improve pallet and barcode recognition. Designed, built, and iterated on camera systems, calibration fixtures, and computer vision hardware.",
+    overviewImage: `${W}/image-1_orig.jpg`,
+    overviewCaption: 'Halloween at the Innovation Lab',
     highlights: [
       'Designed and built two pan-tilt camera prototypes in the Innovation Lab, verified with hand calcs and FEA',
       'Implemented wireless pan-tilt control in Python via SSH, cutting test costs by $15K+ per identification system',
@@ -1543,13 +1616,18 @@ export const EXPERIENCE: Job[] = [
           'ASA 3D-printed enclosure chosen for high impact/wear resistance and thermal tolerance',
           'Wireless Python control over SSH saved $15K+ per identification system vs. commercial alternatives',
         ],
-        images: [
-          { src: `${W}/screenshot-2024-03-09-220401_orig.png`, caption: 'PTZ prototype overview' },
-          { src: `${W}/published/screenshot-2023-12-25-144649.png`, caption: 'V1 - keyboard-controlled pan-tilt' },
-          { src: `${W}/editor/screenshot-2023-12-25-175121.png`, caption: 'V2 - enclosed housing with cable management' },
-          { src: `${W}/editor/20231109-135637-1.gif`, caption: 'PTZ camera in operation' },
-          { src: `${W}/editor/screenshot-2023-12-25-180054.png`, caption: 'V2 belt-pulley mechanism' },
-        ],
+        subBullets: [2, 3],
+        bulletImages: {
+          0: [
+            { src: `${W}/img-0874_orig.gif`, caption: 'Pan — horizontal rotation via stepper motor', cropBottom: 15, cropTop: 10 },
+            { src: `${W}/img-1980_orig.gif`, caption: 'Tilt — vertical articulation via threaded rod', cropBottom: 15, cropTop: 10 },
+            { src: `${W}/editor/20231109-135637-1.gif`, wide: true, caption: 'Live demonstration of wirelessly controlling pan-tilt mechanism' },
+          ],
+          3: [
+            { src: `${W}/screenshot-2023-12-25-175032_orig.png` },
+            { src: `${W}/screenshot-2023-12-25-175047_orig.png` },
+          ],
+        },
       },
       {
         name: 'Camera Calibration Structure (Chandelier)',
@@ -1560,11 +1638,22 @@ export const EXPERIENCE: Job[] = [
           'Central LiDar enables point-cloud visualization to track moving containers across the floor',
           'Coverage area optimized based on horizontal and vertical field-of-view specifications',
         ],
-        images: [
-          { src: `${W}/editor/img-0436-1.jpg`, caption: 'Installed on truss' },
-          { src: `${W}/published/screenshot-2024-01-23-003333.png`, caption: 'Point-cloud visualization coverage' },
-          { src: `${W}/published/screenshot-2023-12-25-003235.png`, caption: 'LiDar placement and field-of-view analysis' },
-        ],
+        bulletImages: {
+          0: [
+            { src: `${W}/published/screenshot-2023-12-25-003235.png`, caption: 'Initial sheet metal design of chandelier', halfWidth: true },
+          ],
+          1: {
+            layout: 'split-stack',
+            items: [
+              { src: `${W}/screenshot-2023-12-25-143644_orig.png` },
+              { src: `${W}/screenshot-2023-12-25-143715_orig.png` },
+              { src: `${W}/editor/img-0436-1.jpg`, caption: 'Installed on truss' },
+            ],
+          },
+          3: [
+            { src: `${W}/screenshot-2023-12-25-143735_orig.png` },
+          ],
+        },
       },
       {
         name: 'Sky Cable Fixed Camera Mount',
@@ -1573,21 +1662,32 @@ export const EXPERIENCE: Job[] = [
           'Increases scanning area range for identifying inbound pallets using lower-cost mechanical cameras',
           'Integrated Raspberry Pi with software package for streamlined image processing',
           'Identified key trade-off: sky cable vibration causes focus loss - requires manual recalibration for small barcodes',
-          'Focus actuation mechanism for barcode-label calibration is patent pending',
         ],
         images: [
-          { src: `${W}/published/thumbnail-597b7f92-5da0-43cc-89e9-1f9362fbf00e.jpg`, caption: 'Sky cable fixed camera mount POC' },
+          { src: `${W}/published/thumbnail-597b7f92-5da0-43cc-89e9-1f9362fbf00e.jpg`, caption: 'Sky cable fixed camera mount POC', hero: true, height: 'h-[32rem]' },
         ],
       },
       {
-        name: 'Miscellaneous Fixtures & Mounts',
+        name: 'Miscellaneous Items',
         description: 'Additional one-off hardware developed across the co-op for computer vision testing infrastructure.',
-        bullets: [
-          'Lens actuation mechanism for mechanical cameras supporting optical characterization and calibration',
-          'Steerable mirror assembly with industrial Harrier camera for redirected field-of-view testing',
-          '45° angle camera mount for truss beam - angled coverage of floor-level targets',
-          'Truss mount for lens actuation on mechanical cameras',
-          'Panasonic PTZ camera fiducial marker mount and truss mounting hardware',
+        bullets: [],
+        pairItems: [
+          { label: 'Lens actuation mechanism for mechanical cameras supporting optical characterization and calibration', images: [
+            { src: `${W}/screenshot-2023-12-25-171659_orig.png`, fit: 'contain' },
+          ]},
+          { label: 'Steerable mirror assembly with industrial Harrier camera for redirected field-of-view testing', images: [
+            { src: `${W}/screenshot-2023-12-25-171904_orig.png`, fit: 'contain' },
+          ]},
+          { label: '45° angle camera mount for truss beam - angled coverage of floor-level targets', images: [
+            { src: `${W}/screenshot-2023-12-25-171804_orig.png`, fit: 'contain' },
+          ]},
+          { label: 'Truss mount for lens actuation on mechanical cameras', images: [
+            { src: `${W}/screenshot-2024-03-09-215840_orig.png`, fit: 'contain' },
+            { src: `${W}/screenshot-2024-03-09-215816_orig.png`, fit: 'contain' },
+          ]},
+          { label: 'Panasonic PTZ camera fiducial marker mount and truss mounting hardware', images: [
+            { src: `${W}/screenshot-2023-12-25-171919_orig.png`, fit: 'contain' },
+          ]},
         ],
       },
     ],

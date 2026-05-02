@@ -1,7 +1,18 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { EXPERIENCE, Job, PairItem } from '../data/content'
 import Lightbox from './Lightbox'
+
+function ZoomOnView({ children, className }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.92', 'center 0.52'] })
+  const scale = useTransform(scrollYProgress, [0, 1], [0.84, 1])
+  return (
+    <motion.div ref={ref} style={{ scale }} className={className}>
+      {children}
+    </motion.div>
+  )
+}
 
 export default function Experience() {
   const [selected, setSelected] = useState<Job | null>(null)
@@ -33,14 +44,7 @@ export default function Experience() {
             {EXPERIENCE.map((job, i) => {
               const isEven = i % 2 === 0
               return (
-                <motion.div
-                  key={job.company}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                  viewport={{ once: true }}
-                  className="relative grid grid-cols-1 md:grid-cols-2"
-                >
+                <ZoomOnView key={job.company} className="relative grid grid-cols-1 md:grid-cols-2">
                   <div
                     className="hidden md:block absolute left-1/2 top-6 -translate-x-1/2 z-10 w-3.5 h-3.5 rounded-full ring-[4px] ring-[#0a0a0a]"
                     style={{ backgroundColor: job.accent }}
@@ -57,24 +61,19 @@ export default function Experience() {
                       <span className="text-xs text-neutral-500">{job.period}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <h3 className="text-xl font-bold text-white">{job.company}</h3>
-                      {job.featured && (
-                        <span
-                          className="px-1.5 py-0.5 rounded text-[10px] font-bold border"
-                          style={{
-                            borderColor: job.accent + '40',
-                            color: job.accent,
-                            background: job.accent + '10',
-                          }}
-                        >
-                          Highlight
-                        </span>
+                    <div className="flex items-start justify-between gap-3 mb-0.5">
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{job.company}</h3>
+                        <p className="text-sm font-semibold" style={{ color: job.accent }}>
+                          {job.role}
+                        </p>
+                      </div>
+                      {job.logo && (
+                        <div className="flex-shrink-0 bg-white rounded-lg px-3 py-1.5">
+                          <img src={job.logo} alt={job.company} className="h-6 w-auto object-contain" />
+                        </div>
                       )}
                     </div>
-                    <p className="text-sm font-semibold mb-0.5" style={{ color: job.accent }}>
-                      {job.role}
-                    </p>
                     <p className="text-xs text-neutral-500 mb-4 hidden md:block">
                       {job.period} · {job.location}
                     </p>
@@ -82,9 +81,9 @@ export default function Experience() {
 
                     <ul className="space-y-2 mb-4">
                       {job.highlights.map((bullet, j) => (
-                        <li key={j} className="flex gap-2.5 text-sm text-neutral-400 leading-relaxed">
+                        <li key={j} className="flex items-center gap-2.5 text-sm text-neutral-400 leading-relaxed">
                           <span
-                            className="mt-2 flex-shrink-0 w-1 h-1 rounded-full"
+                            className="flex-shrink-0 w-1 h-1 rounded-full"
                             style={{ backgroundColor: job.accent + '90' }}
                           />
                           {bullet}
@@ -94,7 +93,7 @@ export default function Experience() {
 
                     <button
                       onClick={() => setSelected(job)}
-                      className="inline-flex items-center gap-1 mt-1 text-xs font-medium transition-colors"
+                      className="inline-flex items-center gap-1 mt-1 text-sm font-medium transition-colors"
                       style={{ color: job.accent + 'cc' }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = job.accent)}
                       onMouseLeave={(e) => (e.currentTarget.style.color = job.accent + 'cc')}
@@ -117,7 +116,7 @@ export default function Experience() {
                       />
                     </div>
                   </div>
-                </motion.div>
+                </ZoomOnView>
               )
             })}
           </div>
@@ -156,11 +155,20 @@ export default function Experience() {
                 style={{ borderTopColor: selected.accent, borderTopWidth: 3 }}
               >
                 <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-0.5">{selected.company}</h3>
-                    <p className="text-sm font-semibold mb-0.5" style={{ color: selected.accent }}>
-                      {selected.role}
-                    </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 mb-0.5">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-0.5">{selected.company}</h3>
+                        <p className="text-sm font-semibold mb-0.5" style={{ color: selected.accent }}>
+                          {selected.role}
+                        </p>
+                      </div>
+                      {selected.logo && (
+                        <div className="flex-shrink-0 bg-white rounded-md px-2.5 py-1">
+                          <img src={selected.logo} alt={selected.company} className="h-7 w-auto object-contain" />
+                        </div>
+                      )}
+                    </div>
                     <p className="text-xs text-neutral-500">{selected.period} · {selected.location}</p>
                   </div>
                   <button
@@ -172,13 +180,18 @@ export default function Experience() {
                 </div>
                 <p className="text-sm text-neutral-400 leading-relaxed mt-3">{selected.overview}</p>
                 {selected.overviewImage && (
-                  <img
-                    src={selected.overviewImage}
-                    alt={selected.company}
-                    className="mt-4 w-full rounded-lg object-contain block mx-auto cursor-zoom-in"
-                    loading="lazy"
-                    onClick={() => setLightboxSrc(selected.overviewImage!)}
-                  />
+                  <div className="mt-4">
+                    <img
+                      src={selected.overviewImage}
+                      alt={selected.company}
+                      className="w-full rounded-lg object-contain block mx-auto cursor-zoom-in"
+                      loading="lazy"
+                      onClick={() => setLightboxSrc(selected.overviewImage!)}
+                    />
+                    {selected.overviewCaption && (
+                      <p className="text-[11px] text-neutral-500 mt-1.5 text-center italic leading-tight">{selected.overviewCaption}</p>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -199,10 +212,10 @@ export default function Experience() {
                       <div className="space-y-3 mt-1">
                         {proj.pairItems.map((item: PairItem, j: number) => (
                           <div key={j} className="flex items-center gap-3">
-                            <p className="flex-1 text-sm text-neutral-400 leading-relaxed">{item.label}</p>
-                            <div className="flex gap-2 flex-shrink-0">
+                            <p className="w-48 flex-shrink-0 text-xs text-neutral-400 leading-relaxed">{item.label}</p>
+                            <div className="flex gap-2 flex-1">
                               {item.images?.map((img, k) => (
-                                <div key={k} className="w-24 h-20 overflow-hidden rounded-lg bg-neutral-900 cursor-zoom-in flex-shrink-0" onClick={() => setLightboxSrc(img.src)}>
+                                <div key={k} className="flex-1 h-36 overflow-hidden rounded-lg bg-neutral-900 cursor-zoom-in" onClick={() => setLightboxSrc(img.src)}>
                                   <img src={img.src} alt="" className={`w-full h-full ${img.fit === 'contain' ? 'object-contain' : 'object-cover'}`} loading="lazy" />
                                 </div>
                               ))}
@@ -211,17 +224,63 @@ export default function Experience() {
                         ))}
                       </div>
                     ) : (
-                      <ul className="space-y-1.5">
+                      <div className="space-y-1.5">
                         {proj.bullets.map((b, j) => (
-                          <li key={j} className="flex gap-2.5 text-sm text-neutral-400 leading-relaxed">
-                            <span
-                              className="mt-2 flex-shrink-0 w-1 h-1 rounded-full"
-                              style={{ backgroundColor: selected.accent + '90' }}
-                            />
-                            {b}
-                          </li>
+                          <div key={j} className={proj.subBullets?.includes(j) ? 'ml-5' : ''}>
+                            <div className="flex items-center gap-2.5 text-sm text-neutral-400 leading-relaxed">
+                              <span
+                                className={`flex-shrink-0 rounded-full ${proj.subBullets?.includes(j) ? 'w-1 h-1 opacity-50' : 'w-1 h-1'}`}
+                                style={{ backgroundColor: selected.accent + '90' }}
+                              />
+                              {b}
+                            </div>
+                            {proj.bulletImages?.[j] && (
+                              <div className="mt-2 mb-5 space-y-2">
+                                {(() => {
+                                  const entry = proj.bulletImages![j]
+                                  const imgEl = (img: { src: string; caption?: string; fit?: string; cropTop?: number; cropBottom?: number; widthClass?: string }, k: number, cls = '') => (
+                                    <div key={k} className={`${cls} ${img.widthClass ? 'flex flex-col items-center' : ''}`}>
+                                      <div className={`overflow-hidden rounded-lg bg-neutral-900 cursor-zoom-in ${img.widthClass ?? 'w-full'}`} onClick={() => setLightboxSrc(img.src)}>
+                                        <img src={img.src} alt="" className={`w-full h-auto block ${img.fit === 'contain' ? 'object-contain' : ''}`} style={(img.cropBottom || img.cropTop) ? { clipPath: `inset(${img.cropTop ?? 0}% 0 ${img.cropBottom ?? 0}% 0)` } : undefined} loading="lazy" />
+                                      </div>
+                                      {img.caption && <p className={`text-[11px] text-neutral-500 mt-1.5 text-center italic leading-tight ${img.widthClass ?? 'w-full'}`}>{img.caption}</p>}
+                                    </div>
+                                  )
+                                  if (!Array.isArray(entry) && entry.layout === 'split-stack') {
+                                    const [left, ...right] = entry.items
+                                    return (
+                                      <div className="flex gap-2">
+                                        <div className="flex-1">
+                                          <div className="overflow-hidden rounded-lg bg-neutral-900 cursor-zoom-in h-full" onClick={() => setLightboxSrc(left.src)}>
+                                            <img src={left.src} alt="" className="w-full h-full object-cover block" loading="lazy" />
+                                          </div>
+                                          {left.caption && <p className="text-[11px] text-neutral-500 mt-1 text-center italic leading-tight">{left.caption}</p>}
+                                        </div>
+                                        <div className="flex-1 flex flex-col gap-2">
+                                          {right.map((img, k) => imgEl(img, k))}
+                                        </div>
+                                      </div>
+                                    )
+                                  }
+                                  const items = Array.isArray(entry) ? entry : entry.items
+                                  const wide = items.filter(img => img.wide)
+                                  const regular = items.filter(img => !img.wide)
+                                  return (
+                                    <>
+                                      {regular.length > 0 && (
+                                        <div className={`${regular.length === 1 && regular[0].halfWidth ? 'flex justify-center' : `grid gap-2 ${regular.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}`}>
+                                          {regular.map((img, k) => imgEl(img, k, regular.length === 1 && img.halfWidth ? 'w-1/2' : ''))}
+                                        </div>
+                                      )}
+                                      {wide.map((img, k) => imgEl(img, k))}
+                                    </>
+                                  )
+                                })()}
+                              </div>
+                            )}
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     )}
 
                     {!proj.pairItems && proj.images && proj.images.length > 0 && (() => {
@@ -235,7 +294,7 @@ export default function Experience() {
                         <div className="mt-4 space-y-3">
                           {hero.map((img, k) => (
                             <div key={k} className="flex flex-col items-center">
-                              <div className={`w-full overflow-hidden rounded-lg bg-neutral-900 cursor-zoom-in ${img.fit === 'contain' ? '' : 'h-48'}`} onClick={() => setLightboxSrc(img.src)}>
+                              <div className={`w-full overflow-hidden rounded-lg bg-neutral-900 cursor-zoom-in ${img.fit === 'contain' ? '' : (img.height ?? 'h-48')}`} onClick={() => setLightboxSrc(img.src)}>
                                 <img src={img.src} alt={img.caption || proj.name} className={img.fit === 'contain' ? 'w-full h-auto block' : 'w-full h-full object-cover'} loading="lazy" />
                               </div>
                               {imgCaption(img)}

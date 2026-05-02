@@ -65,6 +65,8 @@ function Card({ card, onClick }: { card: SkylineCard; onClick: () => void }) {
           <img
             src={card.image}
             alt={card.name}
+            loading="lazy"
+            decoding="async"
             style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', filter: 'brightness(0.78)', transform: `scale(${card.imageZoom ?? 1})` }}
           />
           <div style={{

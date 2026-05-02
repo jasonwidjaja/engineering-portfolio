@@ -37,7 +37,14 @@
       "Bash(python *)",
       "Bash(pip install *)",
       "Bash(explorer C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images *)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(python3 *)",
+      "WebFetch(domain:engineering-portfolio-chi.vercel.app)",
+      "Bash(curl -I https://engineering-portfolio-chi.vercel.app/)",
+      "Bash(curl *)"
     ]
   }
 }

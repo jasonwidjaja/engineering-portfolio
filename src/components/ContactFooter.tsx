@@ -31,27 +31,6 @@ export default function ContactFooter() {
       }}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <h2
-          style={{
-            fontSize: 'clamp(28px, 5vw, 48px)',
-            fontWeight: 900,
-            letterSpacing: '-0.02em',
-            color: '#ffffff',
-            marginBottom: 12,
-          }}
-        >
-          Let's build something.
-        </h2>
-        <p
-          style={{
-            fontSize: 14,
-            color: 'rgba(255,255,255,0.45)',
-            marginBottom: 40,
-          }}
-        >
-          Open to full-time roles in mechanical engineering, robotics, and hardware development.
-        </p>
-
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 56 }}>
           {links.map((link) => (
             <a

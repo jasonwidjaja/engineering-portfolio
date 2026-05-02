@@ -33,9 +33,9 @@ export default function Hero() {
         <div
           className="rounded-3xl px-8 py-10 sm:px-12 sm:py-12 border border-white/[0.06]"
           style={{
-            background: 'rgba(10,10,10,0.72)',
-            backdropFilter: 'blur(18px)',
-            WebkitBackdropFilter: 'blur(18px)',
+            background: 'rgba(10,10,10,0)',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
             boxShadow: `0 0 0 1px rgba(${theme.accentRgb},0.08), 0 32px 80px rgba(0,0,0,0.6)`,
           }}
         >
@@ -49,7 +49,7 @@ export default function Hero() {
               <img
                 src={PERSONAL.headshotSrc}
                 alt={PERSONAL.name}
-                className="relative w-28 h-28 rounded-full object-cover object-top ring-[2.5px]"
+                className="relative w-[168px] h-[168px] rounded-full object-cover object-top ring-[2.5px]"
                 style={{ boxShadow: `0 0 0 2.5px rgba(${theme.accentRgb},0.35)` }}
               />
             </div>
@@ -97,12 +97,12 @@ export default function Hero() {
               Previously at
             </p>
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              {PREVIOUS_COMPANIES.map((co) => (
+              {PREVIOUS_COMPANIES.map((name) => (
                 <span
-                  key={co}
-                  className="px-4 py-1.5 rounded-full border border-neutral-700 text-neutral-300 text-xs sm:text-sm font-medium hover:border-neutral-500 hover:text-white transition-colors"
+                  key={name}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-neutral-700 text-neutral-300 bg-neutral-900/60"
                 >
-                  {co}
+                  {name}
                 </span>
               ))}
             </div>
@@ -133,9 +133,11 @@ export default function Hero() {
           )}
 
           {/* Tagline */}
-          <p className="text-neutral-500 text-sm sm:text-base leading-relaxed max-w-md mx-auto mb-7">
-            {PERSONAL.tagline}
-          </p>
+          <div className="inline-block border border-neutral-600 rounded-lg px-4 py-2.5 mb-7 mx-auto">
+            <p className="text-white font-bold text-sm sm:text-base leading-relaxed max-w-md">
+              {PERSONAL.tagline}
+            </p>
+          </div>
 
           {/* CTAs */}
           <div className="flex items-center justify-center gap-3 flex-wrap">

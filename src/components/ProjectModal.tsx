@@ -27,7 +27,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
 
   const gallery = (project.images ?? []).slice(0, 3)
 
-  function GalleryCarousel({ g }: { g: NonNullable<typeof project.galleries>[number] }) {
+  function GalleryCarousel({ g }: { g: NonNullable<SkylineCard['galleries']>[number] }) {
     const [idx, setIdx] = useState(0)
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -243,6 +243,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                       {project.problem}
                     </p>
                     <InlineImage img={gallery[0]} />
+                    <InlineImage img={project.problemExtra} />
                   </div>
                 )}
 

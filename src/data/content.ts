@@ -540,6 +540,7 @@ export interface SkylineCard {
   images?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string; containerWidth?: string }[]
   galleries?: { label: string; autoScroll?: boolean; images: { src: string; caption?: string; containerWidth?: string }[] }[]
   sideImage?: { src: string; caption?: string }
+  problemExtra?: { src: string; caption?: string; pairSrc?: string; pairCaption?: string }
   problem?: string
   approach?: string
   result?: string
@@ -749,6 +750,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     cardDescription: 'Dual-system supplement dispenser. Hardware lead, team of 5 MEs.',
     accent: 'purple',
     image: '/fitolux-prototype.png',
+    problemExtra: { src: '/fitolux-card-1.png', caption: 'Countertop dispenser CAD render', pairSrc: '/fitolux-card-2.png', pairCaption: 'Portable dispenser CAD render' },
     posterPdf: '/auger_screw_motor_calculation_slides.pdf',
     pdfLabel: 'View Motor Calculations',
     videos: [

@@ -44,7 +44,13 @@
       "Bash(python3 *)",
       "WebFetch(domain:engineering-portfolio-chi.vercel.app)",
       "Bash(curl -I https://engineering-portfolio-chi.vercel.app/)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(Copy-Item \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images\\\\ppo_stage2_deploy.gif\" \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\public\\\\rl\\\\ppo_stage2_deploy.gif\")",
+      "Bash(Copy-Item \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images\\\\sac_stage2_deploy.gif\" \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\public\\\\rl\\\\sac_stage2_deploy.gif\")",
+      "Bash(cp \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images\\\\ppo_stage2_deploy.gif\" \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\public\\\\rl\\\\ppo_stage2_deploy.gif\")",
+      "Bash(cp \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images\\\\sac_stage2_deploy.gif\" \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\public\\\\rl\\\\sac_stage2_deploy.gif\")",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

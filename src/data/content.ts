@@ -533,16 +533,18 @@ export interface SkylineCard {
   cardDescription: string
   accent: 'green' | 'blue' | 'purple' | 'amber'
   image?: string
+  cardImagePair?: [string, string]
   imagePosition?: string                           // CSS objectPosition for the card image
   imageZoom?: number                               // scale factor for the card image (e.g. 0.75 = zoom out 25%)
   headerImage?: { src: string; caption?: string }
-  images?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string }[]
-  galleries?: { label: string; images: { src: string; caption?: string }[] }[]
+  images?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string; containerWidth?: string }[]
+  galleries?: { label: string; autoScroll?: boolean; images: { src: string; caption?: string; containerWidth?: string }[] }[]
   sideImage?: { src: string; caption?: string }
   problem?: string
   approach?: string
   result?: string
   highlights?: string[]
+  imageGrid?: { src: string; caption: string; label?: string }[]
   successGrid?: { title: string; src: string }[]
   articles?: { label: string; url: string }[]
   videos?: { url: string; caption?: string }[]
@@ -570,6 +572,10 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     problem: "Warehouse automation depends on robots that can reliably sort and grasp objects moving on conveyor belts, the kind of repetitive, high-throughput task that defines fulfillment centers. Classical trajectory planning and IK solve this only when the object is stationary. The moment it moves, you can't pre-plan a path to a target that shifts every frame. Deep RL offers a different approach: instead of planning, the arm learns a policy that continuously adapts to where the object actually is. We replicated and extended existing research on vision-based grasping, combining YOLO perception with PPO and SAC to train a Franka Panda arm to intercept soda cans and milk cartons moving at variable belt speeds, entirely through trial and error in simulation.",
     approach: "Built a two-stage curriculum in MuJoCo: Stage 1 trains on a single object (soda can) at fixed belt speed; Stage 2 transfers those weights to handle two object types at random speeds (0.03–0.22 m/s). A YOLOv8n model trained on 500 synthetic images detects the object in a 640×640 overhead camera image and projects the bounding box center to 3D. The RL agent receives a 15-number state vector (7 joint angles, gripper XYZ, object class/XYZ/yaw) and outputs 6 joint angle deltas per step. Reward shapes distance-to-object continuously (+1000 × improvement/step) with a large success bonus (+3000) when the gripper closes within 3 cm. Compared PPO (Juan Cerquera) vs SAC (Jason Widjaja).",
     result: 'Both PPO and SAC reach 100% grasp success rate. SAC gets there 5x faster (~5M steps/stage vs ~24M for PPO) and grasps in fewer steps per episode (17.5 vs 20.8 on Stage 2). Curriculum learning transferred cleanly with no success rate regression when Stage 2 started from Stage 1 weights.',
+    successGrid: [
+      { title: 'PPO — Stage 2 Deployment', src: '/rl/ppo_stage2_deploy.gif' },
+      { title: 'SAC — Stage 2 Deployment', src: '/rl/sac_stage2_deploy.gif' },
+    ],
     highlights: [
       'Implemented and tuned SAC (Soft Actor-Critic): replay buffer of 1M transitions, entropy bonus for exploration, MLP [256, 256], ~5M steps/stage',
       'PPO comparison by teammate: MLP [64, 64], 2048-step rollouts, ~24M steps/stage; both hit 100% success',
@@ -604,8 +610,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
       'Led power transmission design: specified 5:1 planetary gear ratio and increased output pulley diameter by 25% to meet torque spec — validated against prior 6:1 iteration that was mechanically sound but too large to package',
       'Downsized gearbox from 200 mm to 120 mm diameter by switching to COTS McMaster gears modified to accept press-fit bearings',
       'Ideated nut-and-bolt fastener slot geometry in the calf brace for secure, rework-accessible component attachment without adhesives',
-      'Led system integration: coordinated wiring routing, fastener interfaces, and CAN-FD bus layout across calf brace, foot plate, and rail assembly',
-      'Complementary filter (98% gyro / 2% accel) produces stable ankle pitch estimate; 3-second startup calibration sets zero reference',
+
       'Threshold gait logic: pitch < −16° triggers active plantarflexion, pitch > −8° returns motor home passively',
       'Motor control: moteus-C1 FOC at 15–30 kHz, 10 ms position commands over CAN-FD with hardware watchdog safeguard',
       'Power: 4S1P LiPo (14.8 V, 5000 mAh, 74 Wh) with buck converter to 5 V for Raspberry Pi',
@@ -621,14 +626,28 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     image: `${W}/full-barrel-rolling_orig.gif`,
     posterPdf: '/bourbot_final_poster.pdf',
     images: [
+      { src: `${W}/published/screenshot-2025-05-19-004650.png`, caption: 'Bourbot subsystem breakdown' },
       { src: `${W}/published/screenshot-2025-07-03-004616.png`, caption: 'Preliminary Design Sketch of Bourbot' },
-      { src: `${W}/published/screenshot-2025-07-03-004803.png`, caption: 'Ball Screw Calculations', pairSrc: `${W}/published/screenshot-2025-07-03-004839.png`, pairCaption: 'Structural Calculations' },
-      { src: `${W}/lifting-mechanism-front-view-online-video-cutter_orig.gif`, caption: 'Lifting mechanism' },
-      { src: `${W}/published/bourbot.png`, caption: 'Bourbot robot' },
+      { src: `${W}/published/img-9793-online-video-cutter-com.gif`, caption: 'Actuated ball-screw lifting mechanism engaging to allow wedging of barrel' },
       { src: `${W}/published/screenshot-2025-05-19-004650.png`, caption: 'Preliminary design sketch' },
       { src: `${W}/img-7658_orig.gif`, caption: 'Barrel rolling on 4° incline' },
       { src: `${W}/published/img-9793-online-video-cutter-com.gif`, caption: 'Barrel lifting demo' },
       { src: `${W}/editor/img-8672-720.jpg`, caption: 'Team photo – Capstone day' },
+    ],
+    galleries: [
+      {
+        label: 'Design Calculations',
+        images: [
+          { src: `${W}/published/screenshot-2025-07-03-004803.png`, caption: 'Ball Screw Calculations' },
+          { src: `${W}/published/screenshot-2025-07-03-004839.png`, caption: 'Structural Calculations' },
+        ],
+      },
+      {
+        label: 'In Action',
+        images: [
+          { src: '/circle.gif', caption: 'Bourbot navigating tight corners' },
+        ],
+      },
     ],
     problem: "Rickhouses weren't built for machines — narrow aisles, sloped floors, and 550-lb barrels that want to roll wherever they feel like. I had to design a lifting mechanism that could clock a barrel's bung plug to within a few degrees and lift it cleanly, all in a space barely wider than the robot itself.",
     approach: "Designed a ball-screw driven lifting system sized via MATLAB torque and speed calculations. Ran FEA on the lifting frame under worst-case loading. Built the bung clocking mechanism for repeatable angular alignment. Conducted barrel push-force characterization tests to define real design load inputs. Integrated lifting, rolling, and locomotion subsystems and coordinated sequencing with the controls team.",
@@ -662,7 +681,6 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     ],
     images: [
       { src: `${W}/northeastern-cobra-highlights_orig.gif`, caption: 'COBRA locomotion highlights' },
-      { src: `${W}/published/screenshot-2024-01-21-172942.png`, caption: 'Voltage regulator enclosure CAD' },
       { src: `${W}/screenshot-2025-05-25-013343_orig.png`, caption: 'Team photo – NASA Big Idea Forum, Pasadena', fill: true },
       { src: `${W}/published/screenshot-2024-01-21-172919.png`, caption: 'Prototype joint geometry' },
       { src: `${W}/published/screenshot-2024-01-21-174042.png`, caption: 'COBRA joint assembly' },
@@ -679,12 +697,19 @@ export const SKYLINE_CARDS: SkylineCard[] = [
       'Assisted with robot assembly and presented at the NASA Big Idea Forum in Pasadena, CA',
       'Scored top honors across all evaluation criteria — 1st place, $170K+ in funding, Artemis Award',
       'Covered by NASA.gov, Wired, VOA News, and Northeastern University News',
+      'Contributed to technical writing for the project report and competition submission',
     ],
     articles: [
       { label: 'NASA.gov', url: 'https://www.nasa.gov/directorates/stmd/northeastern-university-slithers-to-the-top-with-big-idea-alternative-rover-concept/' },
       { label: 'Wired', url: 'https://www.wired.com/story/rovers-are-so-yesterday-its-time-to-send-a-snakebot-to-space/' },
       { label: 'VOA News', url: 'https://www.voanews.com/a/us-students-big-idea-could-help-nasa-explore-the-moon/6954875.html' },
       { label: 'Northeastern News', url: 'https://news.northeastern.edu/2022/12/07/snake-robot-nasa-moon/' },
+    ],
+    imageGrid: [
+      { src: `${W}/published/screenshot-2024-01-21-172942.png`, caption: 'Iteration 1 — initial enclosure geometry', label: 'Voltage Regulator Enclosure — CAD Iterations' },
+      { src: `${W}/published/screenshot-2024-01-21-172919.png`, caption: 'Iteration 2 — revised profile' },
+      { src: '/screenshot-2024-01-21-173004_orig.png', caption: 'Iteration 3 — further refinement' },
+      { src: `${W}/published/screenshot-2024-01-21-174042.png`, caption: 'Iteration 4 — final square-like geometry' },
     ],
     tags: ['Robotics', 'SolidWorks', 'NASA', 'Locomotion'],
   },
@@ -703,6 +728,10 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     problem: '15 hours, a limited machine shop, and mostly repurposed parts — there was no time to iterate. The needle had to hit every dot deep enough to be readable on the first real run. Any vibration or inconsistent force and a judge\'s finger wouldn\'t feel anything.',
     approach: 'Led full CAD design for a 2-axis gantry with NEMA 23 steppers and lead-screw linear motion. Used a solenoid-driven sewing needle for embossing. Designed motor mount fixtures using 3D printing to reduce vibration and distribute loads. Used zip ties to secure the belt ends of the open-loop belt drive when no closed-loop timing belt was available.',
     result: '3rd place out of 50+ teams at MakeMIT 2023 (theme: Recovery). Printed a braille greeting card live — confirmed readable by a judge whose mother is blind.',
+    successGrid: [
+      { title: 'Embossing in Action', src: '/brailleforge-embossing.gif' },
+      { title: 'Final Braille Postcard', src: '/brailleforge-result.png' },
+    ],
     highlights: [
       'Led full CAD design and 80/20 aluminum structure assembly for a 2-axis gantry system',
       'NEMA 23 stepper motors with lead screws for X/Y positioning and a solenoid + sewing needle for dot embossing',
@@ -719,7 +748,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     category: 'Generate Product Development · Fall 2024',
     cardDescription: 'Dual-system supplement dispenser. Hardware lead, team of 5 MEs.',
     accent: 'purple',
-    image: `${W}/published/fitolux-countertop-ezgif-com-crop-1.gif`,
+    image: '/fitolux-prototype.png',
     posterPdf: '/auger_screw_motor_calculation_slides.pdf',
     pdfLabel: 'View Motor Calculations',
     videos: [
@@ -757,7 +786,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     category: 'Generate Product Development · Spring 2024',
     cardDescription: 'Acoustic concrete delamination detection robot. Led sounder mechanism.',
     accent: 'purple',
-    image: `${W}/published/soundermechanism-10-1.gif`,
+    image: `${W}/published/cstar-08.jpg`,
     posterPdf: '/c-star_hw_final_report.pdf',
     pdfLabel: 'View Final Report',
     videos: [
@@ -792,7 +821,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     category: 'Generate Product Development · Fall 2023',
     cardDescription: 'Dynamic vertical kelp farm system with autonomous depth adjustment.',
     accent: 'purple',
-    image: `${W}/editor/screenshot-2024-01-21-163135.png`,
+    image: '/screenshot-2024-01-21-165110_orig.png',
     posterPdf: '/wavewise_final_report.pdf',
     pdfLabel: 'View Final Report',
     videos: [
@@ -804,7 +833,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
         images: [
           { src: '/screenshot-2024-01-21-162942_orig.png', caption: '(1) Buoy' },
           { src: '/screenshot-2024-01-21-162959_orig.png', caption: '(2) Depth Adjustment System' },
-          { src: '/screenshot-2024-01-21-163020_orig.png', caption: '(3) Submersible Module' },
+          { src: '/screenshot-2024-01-21-163020_orig.png', caption: '(3) Submersible Module', containerWidth: '45%' },
           { src: '/screenshot-2024-01-21-163040_orig.png', caption: '(4) Full Assembly' },
         ],
       },
@@ -876,7 +905,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     imagePosition: 'top',
     imageZoom: 0.75,
     images: [
-      { src: `${W}/published/hammer-cad.png`, caption: 'CAD model' },
+      { src: `${W}/published/hammer-cad.png`, caption: 'CAD model', containerWidth: '37%' },
     ],
     sideImage: { src: `${W}/published/hammer2.jpg`, caption: 'Final assembled hammer' },
     problem: 'Building hands-on manufacturing competency while producing a functional, well-toleranced artifact — taking a CAD design all the way to a finished machined part with correct fit, finish, and assembly.',
@@ -1015,7 +1044,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     accent: 'green',
     image: `${W}/editor/front-view-joradn-access-cad.png`,
     images: [
-      { src: '/screenshot-2023-11-05-010357-orig_orig.png', caption: 'Jordan Access 1 CAD' },
+      { src: '/screenshot-2023-11-05-010357-orig_orig.png', caption: 'The actual Jordan Access 1 — bought in Singapore' },
       { src: `${W}/editor/jordan-access-1-right-view-cad.png`, caption: 'Right view', pairSrc: `${W}/editor/front-view-joradn-access-cad.png`, pairCaption: 'Front view' },
     ],
     problem: 'Develop advanced SolidWorks surfacing and spline techniques through a complex organic geometry challenge as part of CSWA certification coursework.',

@@ -49,7 +49,7 @@ export default function Hero() {
               <img
                 src={PERSONAL.headshotSrc}
                 alt={PERSONAL.name}
-                className="relative w-[168px] h-[168px] rounded-full object-cover object-top ring-[2.5px]"
+                className="relative w-[210px] h-[210px] rounded-full object-cover object-top ring-[2.5px]"
                 style={{ boxShadow: `0 0 0 2.5px rgba(${theme.accentRgb},0.35)` }}
               />
             </div>

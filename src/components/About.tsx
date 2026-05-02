@@ -25,34 +25,45 @@ export default function About() {
   return (
     <section id="about" className="py-14 px-6 border-t border-neutral-900 scroll-mt-16">
       <div className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
-          {/* Bio */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            viewport={{ once: true }}
-          >
-            <p className="text-xs font-semibold tracking-[0.3em] text-neutral-500 uppercase mb-2">About</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-5">
-              The human behind the robots.
-            </h2>
-            <p className="text-neutral-300 text-base leading-relaxed mb-4">
-              Grew up in Queens, NY,  not exactly a hotbed for robotics, but that's kind of the point.
-              I picked Mechanical Engineering because I wanted to take a random thought and turn it into
-              something real you can hold, test, and break.
-            </p>
-            <p className="text-neutral-400 text-base leading-relaxed">
-              That's still what drives me. A sketch on a napkin, a half-baked idea from a team meeting.
-              I want to be the person who figures out how to build it.
-            </p>
-          </motion.div>
+        <div className="flex flex-col gap-10">
+          {/* Bio + Photo */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+            >
+              <p className="text-xs font-semibold tracking-[0.3em] text-neutral-500 uppercase mb-2">About</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-5">
+                The human behind the robots.
+              </h2>
+              <p className="text-neutral-300 text-base leading-relaxed">
+                Queens kid. Northeastern grad. MS in Robotics, BS in Mechanical Engineering, three co-ops deep (Amazon Robotics, Draper, Berkshire Grey). I've built robots that lift 550-lb barrels, designed parts for lunar snake robots, and saved 62% on production costs by convincing everyone sheet metal was the answer. When I'm not in the shop, I'm cooking, hiking, hooping, or letting the Knicks ruin my evening. I like building things that actually work.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <img
+                src="/about-photo.png"
+                alt="Jason hiking"
+                className="rounded-2xl object-cover w-full max-w-xs md:max-w-full"
+                style={{ maxHeight: 420 }}
+              />
+            </motion.div>
+          </div>
 
           {/* Skills */}
           <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
             viewport={{ once: true }}
           >
             <p className="text-xs font-semibold tracking-[0.3em] text-neutral-500 uppercase mb-2">

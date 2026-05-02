@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import type { SkylineCard } from '../data/content'
@@ -11,8 +11,6 @@ interface Props {
 
 export default function ProjectModal({ project, onClose, onLightbox }: Props) {
   const { theme } = useTheme()
-  const [galleryIndices, setGalleryIndices] = useState<Record<string, number>>({})
-  useEffect(() => { setGalleryIndices({}) }, [project?.id])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -29,6 +27,95 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
 
   const gallery = (project.images ?? []).slice(0, 3)
 
+  function GalleryCarousel({ g }: { g: NonNullable<typeof project.galleries>[number] }) {
+    const [idx, setIdx] = useState(0)
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+    const resetTimer = () => {
+      if (!g.autoScroll) return
+      if (timerRef.current) clearInterval(timerRef.current)
+      timerRef.current = setInterval(() => setIdx(i => (i + 1) % g.images.length), 2500)
+    }
+
+    useEffect(() => {
+      if (g.autoScroll) resetTimer()
+      return () => { if (timerRef.current) clearInterval(timerRef.current) }
+    }, [])
+
+    const go = (next: number) => { setIdx(next); resetTimer() }
+
+    const btnStyle: React.CSSProperties = {
+      position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+      width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.18)',
+      background: 'rgba(0,0,0,0.55)', color: '#fff', cursor: 'pointer',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 16, lineHeight: 1, padding: 0, zIndex: 2,
+    }
+    const item = g.images[idx]
+
+    if (g.images.length === 2 && !g.autoScroll) {
+      return (
+        <div>
+          <div style={sectionLabel}>{g.label}</div>
+          <div style={{ width: '75%', margin: '0 auto' }}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {g.images.map((im, i) => (
+                <div key={i} style={{ flex: 1 }}>
+                  <div style={{ borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
+                    onClick={() => onLightbox(im.src)}>
+                    <img src={im.src} alt={im.caption ?? ''} style={{ width: '100%', height: 220, objectFit: 'contain', display: 'block' }} loading="lazy" />
+                  </div>
+                  {im.caption && (
+                    <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4, textAlign: 'center' }}>
+                      {im.caption}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div>
+        <div style={sectionLabel}>{g.label}</div>
+        <div style={{ position: 'relative' }}>
+          <div style={{ width: item.containerWidth ?? '75%', margin: '0 auto', borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
+            onClick={() => onLightbox(item.src)}>
+            <img src={item.src} alt={item.caption ?? ''} style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />
+          </div>
+          {g.images.length > 1 && (
+            <>
+              <button style={{ ...btnStyle, left: 0 }} onClick={() => go((idx - 1 + g.images.length) % g.images.length)}>‹</button>
+              <button style={{ ...btnStyle, right: 0 }} onClick={() => go((idx + 1) % g.images.length)}>›</button>
+            </>
+          )}
+        </div>
+        {item.caption && (
+          <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '6px 0 0', lineHeight: 1.4, textAlign: 'center' }}>
+            {item.caption}
+          </p>
+        )}
+        {g.images.length > 1 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 8 }}>
+            {g.images.map((_, i) => (
+              <button key={i} onClick={() => go(i)} style={{
+                width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: 'none',
+                cursor: 'pointer', padding: 0, transition: 'all 0.2s',
+                background: i === idx ? theme.accent : 'rgba(255,255,255,0.2)',
+              }} />
+            ))}
+            <span style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)', marginLeft: 4 }}>
+              {idx + 1} / {g.images.length}
+            </span>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   const sectionLabel: React.CSSProperties = {
     fontSize: 11,
     fontFamily: 'monospace',
@@ -38,7 +125,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
     marginBottom: 7,
   }
 
-  function InlineImage({ img }: { img?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string } }) {
+  function InlineImage({ img }: { img?: { src: string; caption?: string; fill?: boolean; filter?: string; cropBottom?: number; pairSrc?: string; pairCaption?: string; containerWidth?: string } }) {
     if (!img) return null
     if (img.pairSrc) {
       return (
@@ -50,7 +137,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                   style={{ borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
                   onClick={() => onLightbox(item.src)}
                 >
-                  <img src={item.src} alt={item.caption ?? ''} style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />
+                  <img src={item.src} alt={item.caption ?? ''} style={{ width: '100%', height: 220, objectFit: 'contain', display: 'block' }} loading="lazy" />
                 </div>
                 {item.caption && (
                   <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4, textAlign: 'center' }}>
@@ -64,7 +151,7 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
       )
     }
     return (
-      <div style={{ marginTop: 12, width: '75%', margin: '12px auto 0' }}>
+      <div style={{ marginTop: 12, width: img.containerWidth ?? '75%', margin: '12px auto 0' }}>
         <div
           style={{ borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
           onClick={() => onLightbox(img.src)}
@@ -171,57 +258,31 @@ export default function ProjectModal({ project, onClose, onLightbox }: Props) {
                 )}
 
                 {/* Galleries (carousel) */}
-                {project.galleries && project.galleries.map((gallery) => {
-                  const idx = galleryIndices[gallery.label] ?? 0
-                  const item = gallery.images[idx]
-                  const setIdx = (next: number) =>
-                    setGalleryIndices(prev => ({ ...prev, [gallery.label]: next }))
-                  const btnStyle: React.CSSProperties = {
-                    position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                    width: 28, height: 28, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.18)',
-                    background: 'rgba(0,0,0,0.55)', color: '#fff', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, lineHeight: 1, padding: 0, zIndex: 2,
-                  }
-                  return (
-                    <div key={gallery.label}>
-                      <div style={sectionLabel}>{gallery.label}</div>
-                      <div style={{ position: 'relative' }}>
-                        <div style={{ width: '75%', margin: '0 auto', borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
-                          onClick={() => onLightbox(item.src)}>
-                          <img src={item.src} alt={item.caption ?? ''} style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />
+                {project.galleries && project.galleries.map((g) => (
+                  <GalleryCarousel key={g.label} g={g} />
+                ))}
+
+                {/* Image grid (2×2 with captions below) */}
+                {project.imageGrid && project.imageGrid.length > 0 && (
+                  <div>
+                    {project.imageGrid[0].label && <div style={sectionLabel}>{project.imageGrid[0].label}</div>}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+                      {project.imageGrid.map((item, i) => (
+                        <div key={i}>
+                          <div
+                            style={{ borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.03)', cursor: 'zoom-in' }}
+                            onClick={() => onLightbox(item.src)}
+                          >
+                            <img src={item.src} alt={item.caption} style={{ width: '100%', height: 'auto', display: 'block' }} loading="lazy" />
+                          </div>
+                          <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '5px 2px 0', lineHeight: 1.4, textAlign: 'center' }}>
+                            {item.caption}
+                          </p>
                         </div>
-                        {gallery.images.length > 1 && (
-                          <>
-                            <button style={{ ...btnStyle, left: 0 }}
-                              onClick={() => setIdx((idx - 1 + gallery.images.length) % gallery.images.length)}>‹</button>
-                            <button style={{ ...btnStyle, right: 0 }}
-                              onClick={() => setIdx((idx + 1) % gallery.images.length)}>›</button>
-                          </>
-                        )}
-                      </div>
-                      {item.caption && (
-                        <p style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', margin: '6px 0 0', lineHeight: 1.4, textAlign: 'center' }}>
-                          {item.caption}
-                        </p>
-                      )}
-                      {gallery.images.length > 1 && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 8 }}>
-                          {gallery.images.map((_, i) => (
-                            <button key={i} onClick={() => setIdx(i)} style={{
-                              width: i === idx ? 18 : 6, height: 6, borderRadius: 3, border: 'none',
-                              cursor: 'pointer', padding: 0, transition: 'all 0.2s',
-                              background: i === idx ? theme.accent : 'rgba(255,255,255,0.2)',
-                            }} />
-                          ))}
-                          <span style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)', marginLeft: 4 }}>
-                            {idx + 1} / {gallery.images.length}
-                          </span>
-                        </div>
-                      )}
+                      ))}
                     </div>
-                  )
-                })}
+                  </div>
+                )}
 
                 {/* Result */}
                 {project.result && (

@@ -27,7 +27,13 @@ function ExplodedCard({ card, onOpen }: CardProps) {
     >
       {/* Layer 1: Image */}
       <div className="exploded-layer exploded-layer-image">
-        {card.image ? (
+        {card.cardImagePair ? (
+          <div className="relative overflow-hidden flex" style={{ height: '110px' }}>
+            <img src={card.cardImagePair[0]} alt={card.name} className="w-1/2 h-full object-cover" style={{ filter: 'brightness(0.75)' }} />
+            <img src={card.cardImagePair[1]} alt={card.name} className="w-1/2 h-full object-cover" style={{ filter: 'brightness(0.75)' }} />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${theme.colors.background}cc)` }} />
+          </div>
+        ) : card.image ? (
           <div className="relative overflow-hidden" style={{ height: '110px' }}>
             <img src={card.image} alt={card.name} className="w-full h-full object-cover" style={{ filter: 'brightness(0.75)' }} />
             <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${theme.colors.background}cc)` }} />
@@ -95,9 +101,16 @@ function BlueprintCard({ card, onOpen }: CardProps) {
         <h3 className="text-sm font-semibold mb-2.5 leading-snug" style={{ color: theme.colors.text, fontFamily: theme.font.heading }}>
           {card.name}
         </h3>
-        {card.image && (
-          <div className="overflow-hidden mb-3 opacity-70" style={{ height: '80px', borderLeft: `2px solid ${accent}50` }}>
-            <img src={card.image} alt={card.name} className="w-full h-full object-cover" />
+        {(card.cardImagePair || card.image) && (
+          <div className="overflow-hidden mb-3 opacity-70 flex" style={{ height: '80px', borderLeft: `2px solid ${accent}50` }}>
+            {card.cardImagePair ? (
+              <>
+                <img src={card.cardImagePair[0]} alt={card.name} className="w-1/2 h-full object-cover" />
+                <img src={card.cardImagePair[1]} alt={card.name} className="w-1/2 h-full object-cover" />
+              </>
+            ) : (
+              <img src={card.image} alt={card.name} className="w-full h-full object-cover" />
+            )}
           </div>
         )}
         <p className="text-xs leading-relaxed mb-3" style={{ color: theme.colors.textMuted }}>
@@ -135,9 +148,16 @@ function HoloCard({ card, onOpen }: CardProps) {
       onMouseEnter={handleMouseEnter}
       onClick={() => onOpen(card)}
     >
-      {card.image && (
-        <div className="relative" style={{ height: '110px' }}>
-          <img src={card.image} alt={card.name} className="w-full h-full object-cover" style={{ filter: 'brightness(0.55) saturate(0.7)' }} />
+      {(card.cardImagePair || card.image) && (
+        <div className="relative flex" style={{ height: '110px' }}>
+          {card.cardImagePair ? (
+            <>
+              <img src={card.cardImagePair[0]} alt={card.name} className="w-1/2 h-full object-cover" style={{ filter: 'brightness(0.55) saturate(0.7)' }} />
+              <img src={card.cardImagePair[1]} alt={card.name} className="w-1/2 h-full object-cover" style={{ filter: 'brightness(0.55) saturate(0.7)' }} />
+            </>
+          ) : (
+            <img src={card.image} alt={card.name} className="w-full h-full object-cover" style={{ filter: 'brightness(0.55) saturate(0.7)' }} />
+          )}
           <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 20%, ${theme.colors.background}dd)` }} />
         </div>
       )}

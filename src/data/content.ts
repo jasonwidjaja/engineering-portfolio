@@ -989,6 +989,8 @@ export const SKYLINE_CARDS: SkylineCard[] = [
       'Fastener and material stiffness calculations at the clamp-rail interface — verified FOS against bolt failure and loosening',
       'Full CAD and animation in Onshape with mechanism frame analysis',
     ],
+    posterPdf: '/whisk_final_report.pdf',
+    pdfLabel: 'View Final Report',
     tags: ['Onshape', 'Mechanisms', 'Fatigue Analysis', 'ME Design'],
   },
   {

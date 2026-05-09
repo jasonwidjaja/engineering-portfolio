@@ -877,6 +877,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     imagePosition: 'top',
     imageZoom: 0.75,
     images: [
+      { src: '/robotic-hand.gif', caption: 'Five-finger tendon-driven actuation' },
       { src: `${W}/published/robot-hand1.jpg`, caption: 'Servo pulley system and tension cable routing' },
       { src: `${W}/published/robot-hand2.jpg`, caption: 'Tendon-driven finger actuation' },
     ],
@@ -928,6 +929,7 @@ export const SKYLINE_CARDS: SkylineCard[] = [
     accent: 'green',
     image: `${W}/editor/img-6961-mov-adobeexpress.gif`,
     images: [
+      { src: `${W}/editor/img-6961-mov-adobeexpress.gif`, caption: 'Ball dispensing and tee height demo' },
       { src: `${W}/published/screenshot-2024-01-21-171844.png`, caption: 'Full system assembly' },
     ],
     sideImage: { src: `${W}/screenshot-2024-01-21-171918_orig.png`, caption: 'Feeder mechanism detail' },

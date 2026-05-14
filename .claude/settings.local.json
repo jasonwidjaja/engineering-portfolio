@@ -50,7 +50,18 @@
       "Bash(cp \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images\\\\ppo_stage2_deploy.gif\" \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\public\\\\rl\\\\ppo_stage2_deploy.gif\")",
       "Bash(cp \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\portfolio_images\\\\sac_stage2_deploy.gif\" \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\\\\public\\\\rl\\\\sac_stage2_deploy.gif\")",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(where yt-dlp *)",
+      "Bash(where youtube-dl *)",
+      "Bash(pip show *)",
+      "Bash(winget install *)",
+      "Bash(ffprobe -v quiet -show_entries format=duration -of csv=p=0 temp_robotic_hand.mp4)",
+      "Bash(\"C:\\\\Users\\\\jason\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Links\\\\ffprobe.exe\" -v quiet -show_entries format=duration -of csv=p=0 temp_robotic_hand.mp4)",
+      "PowerShell(Get-Command *)",
+      "Bash(C:/Users/jason/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1-full_build/bin/ffmpeg.exe -i temp_robotic_hand.mp4 -vf 'fps=12,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse=dither=bayer' -loop 0 public/robotic-hand.gif)",
+      "Bash(C:/Users/jason/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1-full_build/bin/ffmpeg.exe -y -ss 0 -t 12 -i temp_robotic_hand.mp4 -vf 'fps=10,scale=400:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=64[p];[s1][p]paletteuse=dither=bayer' -loop 0 public/robotic-hand.gif)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jason\\\\Engineering Portfolio\" -Recurse -Force)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

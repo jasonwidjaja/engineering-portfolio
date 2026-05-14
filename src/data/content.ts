@@ -86,8 +86,8 @@ export interface OffDutyHighlight {
 export const PERSONAL = {
   name: 'Jason Matthew Widjaja',
   title: 'Mechanical Engineer',
-  tagline: 'Open to full-time roles in mechanical engineering, robotics, and hardware development in Summer 2026.',
-  location: 'Boston, MA',
+  tagline: 'Open to full-time roles in mechanical engineering, consumer product development, med devices, and hardware development. Available immediately.',
+  location: 'Queens, NY',
   email: 'widjaja.ja@northeastern.edu',
   linkedin: 'https://www.linkedin.com/in/jason-matthew-widjaja/',
   resumePdf: '/Jason_Widjaja_Resume.pdf',

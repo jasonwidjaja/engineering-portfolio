@@ -93,7 +93,7 @@ export const PERSONAL = {
   resumePdf: '/Jason_Widjaja_Resume.pdf',
   headshotSrc: '/headshot.jpg',
   bio: [
-    "Queens kid. Northeastern grad. MS in Robotics, BS in Mechanical Engineering, three co-ops deep (Amazon Robotics, Draper, Berkshire Grey). I've built robots that lift 550-lb barrels, designed parts for lunar snake robots, and saved 62% on production costs by convincing everyone sheet metal was the answer. When I'm not in the shop, I'm cooking, hiking, hooping, or letting the Knicks ruin my evening. I like building things that actually work.",
+    "Queens kid. Northeastern grad. MS in Robotics, BS in Mechanical Engineering, three co-ops deep (Amazon Robotics, Draper, Berkshire Grey). I've built robots that lift 550-lb barrels, designed parts for lunar snake robots, and saved 62% on production costs by convincing everyone sheet metal was the answer. When I'm not in the shop, I'm cooking, hiking, hooping, or letting the Knicks <s>ruin</s> make my evening. I like building things that actually work.",
   ],
 }
 
